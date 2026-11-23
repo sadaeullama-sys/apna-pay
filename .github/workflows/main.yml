@@ -21,11 +21,14 @@ jobs:
       - name: Create Android platform files if missing
         run: |
           if [ ! -d android ]; then
-            flutter create --platforms=android --org com.apnapay.app .
+            flutter create --project-name apna_pay --platforms=android --org com.apnapay.app .
           fi
-      - run: flutter pub get
-      - run: dart run flutter_launcher_icons
-      - run: flutter build apk --release
+      - name: Install Flutter dependencies
+        run: flutter pub get
+      - name: Generate Android launcher icons
+        run: dart run flutter_launcher_icons
+      - name: Build release APK
+        run: flutter build apk --release
       - uses: actions/upload-artifact@v4
         with:
           name: apna-pay-demo-apk
