@@ -23,6 +23,12 @@ jobs:
           if [ ! -d android ]; then
             flutter create --project-name apna_pay --platforms=android --org com.apnapay.app .
           fi
+      - name: Configure Android biometric activity
+        run: |
+          ACTIVITY=$(find android/app/src/main -name 'MainActivity.kt' -o -name 'MainActivity.java' | head -n 1)
+          if [ -n "$ACTIVITY" ]; then
+            sed -i 's/FlutterActivity/FlutterFragmentActivity/g' "$ACTIVITY"
+          fi
       - name: Install Flutter dependencies
         run: flutter pub get
       - name: Generate Android launcher icons
