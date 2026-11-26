@@ -210,13 +210,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int tab = 0;
   @override Widget build(BuildContext context) {
-    final pages = [const Dashboard(), const HistoryScreen(), const ProfileScreen()];
+    final pages = [const Dashboard(), const HistoryScreen(), const QuickActionsScreen(), const CardsScreen(), const HelpScreen()];
     return Scaffold(
       body: pages[tab],
       bottomNavigationBar: NavigationBar(selectedIndex: tab, onDestinationSelected: (v) => setState(() => tab = v), destinations: const [
-        NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
-        NavigationDestination(icon: Icon(Icons.history), label: 'History'),
-        NavigationDestination(icon: Icon(Icons.person_outline), label: 'Account'),
+        NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
+        NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Activity'),
+        NavigationDestination(icon: Icon(Icons.qr_code_scanner), label: 'Pay'),
+        NavigationDestination(icon: Icon(Icons.credit_card), label: 'Cards'),
+        NavigationDestination(icon: Icon(Icons.support_agent), label: 'Help'),
       ]),
     );
   }
@@ -226,39 +228,31 @@ class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
   @override Widget build(BuildContext context) => AnimatedBuilder(animation: data, builder: (_, __) => Scaffold(
     body: SafeArea(child: ListView(padding: const EdgeInsets.only(bottom: 24), children: [
-      Container(padding: const EdgeInsets.fromLTRB(20, 24, 20, 32), decoration: const BoxDecoration(color: brand, borderRadius: BorderRadius.vertical(bottom: Radius.circular(28))), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [const Expanded(child: Text('APNA PAY', style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.w900))), IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none, color: Colors.white))]),
-        Text('Assalam-o-Alaikum, ${data.fullName.isEmpty ? "User" : data.fullName}', style: const TextStyle(color: Colors.white, fontSize: 17)),
-        const SizedBox(height: 20), const Text('Demo Wallet Balance', style: TextStyle(color: Colors.white70)),
-        Text('Rs. ${data.balance.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.bold)),
+      Padding(padding: const EdgeInsets.fromLTRB(18, 14, 18, 10), child: Row(children: [
+        const Expanded(child: Text('APNA PAY', style: TextStyle(color: brand, fontSize: 25, fontWeight: FontWeight.w900))),
+        IconButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpScreen())), icon: const Icon(Icons.notifications_none)),
+        const CircleAvatar(backgroundColor: brand, child: Text('AP', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
       ])),
-      Padding(padding: const EdgeInsets.fromLTRB(18, 18, 18, 8), child: Row(children: [
-        Expanded(child: _action(context, Icons.send, 'Send Money', () => _amount(context, 'Send Money (Demo)', false))),
-        Expanded(child: _action(context, Icons.phone_android, 'Mobile Load', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MobileLoadScreen())))),
-        Expanded(child: _action(context, Icons.receipt_long, 'Bill Pay', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BillPayScreen())))),
-        Expanded(child: _action(context, Icons.add_card, 'Add Money', () => _amount(context, 'Add Demo Money', true))),
+      Container(margin: const EdgeInsets.symmetric(horizontal: 16), padding: const EdgeInsets.all(22), decoration: BoxDecoration(color: brand, borderRadius: BorderRadius.circular(22)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Assalam-o-Alaikum, ${data.fullName.isEmpty ? "User" : data.fullName}', style: const TextStyle(color: Colors.white, fontSize: 16)),
+        const SizedBox(height: 18), const Text('Available Demo Balance', style: TextStyle(color: Colors.white70)),
+        Text('Rs. ${data.balance.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8), const Text('DEMO WALLET • No real funds', style: TextStyle(color: Colors.white70, fontSize: 11)),
       ])),
-      Padding(padding: const EdgeInsets.fromLTRB(18, 8, 18, 12), child: Row(children: [
-        Expanded(child: _action(context, Icons.account_balance, 'Govt Fees', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BillPayScreen())))),
-        Expanded(child: _action(context, Icons.school, 'Education Fee', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BillPayScreen())))),
-        Expanded(child: _action(context, Icons.wifi, 'Packages', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MobileLoadScreen())))),
-        Expanded(child: _action(context, Icons.history, 'History', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryScreen())))),
+      Padding(padding: const EdgeInsets.fromLTRB(16, 20, 16, 8), child: Row(children: [
+        Expanded(child: _action(context, Icons.send_rounded, 'Send Money', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SendMoneyScreen())))),
+        Expanded(child: _action(context, Icons.account_balance_wallet, 'Add Money', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AddMoneyScreen())))),
+        Expanded(child: _action(context, Icons.phone_android, 'Mobile Loads', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MobileLoadScreen())))),
+        Expanded(child: _action(context, Icons.receipt_long, 'Bill Payment', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BillPayScreen())))),
       ])),
-      Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: Card(child: ListTile(
-        leading: const CircleAvatar(backgroundColor: Color(0xFFE1F4EA), child: Icon(Icons.verified_user, color: brand)),
-        title: const Text('KYC Status'), subtitle: Text(data.kycStatus),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KycScreen())),
-      ))),
+      Padding(padding: const EdgeInsets.fromLTRB(16, 8, 16, 8), child: Card(child: ListTile(leading: const Icon(Icons.payments_outlined, color: brand), title: const Text('Payments & Services'), subtitle: const Text('Electricity • Gas • Water • Internet • Government fees'), trailing: const Icon(Icons.chevron_right), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PaymentsScreen()))))),
+      Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Card(child: ListTile(leading: const CircleAvatar(backgroundColor: Color(0xFFE1F4EA), child: Icon(Icons.verified_user, color: brand)), title: const Text('KYC Status'), subtitle: Text(data.kycStatus), trailing: const Icon(Icons.chevron_right), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KycScreen()))))),
       const Padding(padding: EdgeInsets.fromLTRB(20, 14, 20, 8), child: Text('Recent Activity', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
       ...data.activity.take(5).map((e) => ListTile(leading: const CircleAvatar(child: Icon(Icons.swap_horiz)), title: Text(e), subtitle: const Text('Demo record'))),
       const Padding(padding: EdgeInsets.all(16), child: Text('DEMO ONLY — no real money transfer, bill payment or identity verification.', textAlign: TextAlign.center, style: TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.w600))),
     ])),
   ));
-  Widget _action(BuildContext c, IconData icon, String title, VoidCallback tap) => InkWell(onTap: tap, child: Column(children: [
-    CircleAvatar(radius: 25, backgroundColor: const Color(0xFFE3F5EB), child: Icon(icon, color: brand)),
-    const SizedBox(height: 7), Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
-  ]));
+  Widget _action(BuildContext c, IconData icon, String title, VoidCallback tap) => InkWell(onTap: tap, child: Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Column(children: [CircleAvatar(radius: 25, backgroundColor: const Color(0xFFE3F5EB), child: Icon(icon, color: brand)), const SizedBox(height: 7), Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600))])));
 }
 
 void _amount(BuildContext context, String title, bool credit) {
@@ -437,6 +431,29 @@ class _BillPayScreenState extends State<BillPayScreen> {
     ]),
   );
 }
+
+
+class SendMoneyScreen extends StatefulWidget { const SendMoneyScreen({super.key}); @override State<SendMoneyScreen> createState()=>_SendMoneyScreenState(); }
+class _SendMoneyScreenState extends State<SendMoneyScreen> {
+  final phone=TextEditingController(), amount=TextEditingController(); String bank='APNA PAY Wallet';
+  final banks=['APNA PAY Wallet','JazzCash','Easypaisa','HBL','UBL','Meezan Bank','Allied Bank','Bank Alfalah','Other Bank'];
+  @override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text('Send Money')),body:ListView(padding:const EdgeInsets.all(20),children:[
+    const Text('New Transfer',style:TextStyle(fontSize:22,fontWeight:FontWeight.bold)),const SizedBox(height:14),TextField(controller:phone,keyboardType:TextInputType.phone,decoration:const InputDecoration(labelText:'Mobile / Account Number',prefixIcon:Icon(Icons.contact_phone))),const SizedBox(height:18),const Text('Select Bank / Wallet'),const SizedBox(height:8),DropdownButtonFormField<String>(value:bank,items:banks.map((b)=>DropdownMenuItem(value:b,child:Text(b))).toList(),onChanged:(v)=>setState(()=>bank=v!),decoration:const InputDecoration()),const SizedBox(height:18),TextField(controller:amount,keyboardType:TextInputType.number,decoration:const InputDecoration(labelText:'Amount (PKR)',prefixText:'Rs. ')),const SizedBox(height:22),FilledButton(onPressed:(){final v=double.tryParse(amount.text);if(phone.text.trim().length<8||v==null||v<=0){ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('Enter a valid account number and amount.')));return;}if(v>data.balance){ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('Insufficient demo balance.')));return;}data.add('Send Money • $bank • ${phone.text.trim()}',v);ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('Demo transfer recorded only. No money was sent.')));Navigator.pop(context);},child:const Text('Confirm Demo Transfer')),const SizedBox(height:10),const Text('Real transfers require AFT / bank / wallet partner APIs and regulatory approval.',style:TextStyle(color:Colors.deepOrange))]));
+}
+
+class AddMoneyScreen extends StatefulWidget { const AddMoneyScreen({super.key}); @override State<AddMoneyScreen> createState()=>_AddMoneyScreenState(); }
+class _AddMoneyScreenState extends State<AddMoneyScreen>{final amount=TextEditingController();String method='Bank Transfer';final methods=['Bank Transfer','Link Bank Account','Debit / Credit Card','Cash Deposit Machine','Agent Deposit'];@override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text('Add Cash')),body:ListView(padding:const EdgeInsets.all(20),children:[const Text('Choose a method and add demo cash to your wallet',style:TextStyle(fontSize:18,fontWeight:FontWeight.w600,color:brand)),const SizedBox(height:22),...methods.map((m)=>Card(child:RadioListTile<String>(value:m,groupValue:method,onChanged:(v)=>setState(()=>method=v!),title:Text(m),secondary:const Icon(Icons.account_balance,color:brand)))),const SizedBox(height:18),TextField(controller:amount,keyboardType:TextInputType.number,decoration:const InputDecoration(labelText:'Amount (PKR)',prefixText:'Rs. ')),const SizedBox(height:20),FilledButton(onPressed:(){final v=double.tryParse(amount.text);if(v==null||v<=0)return;data.add('Add Cash • $method',v,credit:true);ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('Demo cash added. No bank/card transaction occurred.')));Navigator.pop(context);},child:const Text('Add Demo Cash')),const SizedBox(height:10),const Text('Bank linking, card payments and cash deposit confirmation are not connected in demo mode.',style:TextStyle(color:Colors.deepOrange))]));}
+
+class PaymentsScreen extends StatelessWidget { const PaymentsScreen({super.key}); @override Widget build(BuildContext context){final items=['Electricity','Gas','Water','Telephone','Internet','School Fees','University Fees','Government Fees','Passport / NADRA Fee','Traffic E-Challan','Insurance','E-commerce'];return Scaffold(appBar:AppBar(title:const Text('Payments')),body:ListView(padding:const EdgeInsets.all(16),children:[const Text('All your payments in one place!',style:TextStyle(fontSize:18,fontWeight:FontWeight.w600)),const SizedBox(height:16),Card(child:ListTile(leading:const Icon(Icons.receipt_long,color:brand),title:const Text('My Bills'),trailing:const Icon(Icons.chevron_right),onTap:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const BillPayScreen())))),const SizedBox(height:12),GridView.count(shrinkWrap:true,physics:const NeverScrollableScrollPhysics(),crossAxisCount:3,childAspectRatio:1.12,children:items.map((e)=>InkWell(onTap:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const BillPayScreen())),child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[CircleAvatar(radius:25,backgroundColor:const Color(0xFFE3F5EB),child:Icon(_icon(e),color:brand)),const SizedBox(height:7),Text(e,textAlign:TextAlign.center,style:const TextStyle(fontSize:12,fontWeight:FontWeight.w600))]))).toList()),const Text('Service availability depends on an approved biller/payment partner.',style:TextStyle(color:Colors.deepOrange))]));}}
+IconData _icon(String s){if(s.contains('Electric'))return Icons.bolt;if(s=='Gas')return Icons.local_fire_department;if(s=='Water')return Icons.water_drop;if(s.contains('Fees'))return Icons.school;if(s.contains('Internet'))return Icons.wifi;if(s.contains('Telephone'))return Icons.phone;return Icons.receipt_long;}
+
+class QuickActionsScreen extends StatelessWidget { const QuickActionsScreen({super.key}); @override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text('Pay & Scan')),body:ListView(padding:const EdgeInsets.all(20),children:[const Icon(Icons.qr_code_scanner,size:90,color:brand),const Text('Scan & Pay',textAlign:TextAlign.center,style:TextStyle(fontSize:24,fontWeight:FontWeight.bold)),const SizedBox(height:8),const Text('QR payment preview. Camera and merchant payment network are not connected.',textAlign:TextAlign.center),const SizedBox(height:22),FilledButton(onPressed:()=>ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('QR payments will be enabled after partner integration.'))),child:const Text('Open QR Scanner (Demo)')),const SizedBox(height:12),OutlinedButton(onPressed:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const SendMoneyScreen())),child:const Text('Send Money'))]));}}
+
+class CardsScreen extends StatelessWidget { const CardsScreen({super.key}); @override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text('APNA PAY Cards')),body:ListView(padding:const EdgeInsets.all(20),children:[Container(height:190,padding:const EdgeInsets.all(22),decoration:BoxDecoration(gradient:const LinearGradient(colors:[Color(0xFF16B879),Color(0xFF07583C)]),borderRadius:BorderRadius.circular(20)),child:const Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text('APNA PAY',style:TextStyle(color:Colors.white,fontSize:24,fontWeight:FontWeight.bold)),Spacer(),Icon(Icons.contactless,color:Colors.white,size:34),Spacer(),Text('DEMO CARD • **** **** **** 0000',style:TextStyle(color:Colors.white,fontWeight:FontWeight.bold))])),const SizedBox(height:20),const Text('Card services',style:TextStyle(fontSize:20,fontWeight:FontWeight.bold)),ListTile(leading:const Icon(Icons.credit_card,color:brand),title:const Text('Order Debit Card'),subtitle:const Text('Physical / Virtual card (preview)'),onTap:()=>_cardMessage(context)),ListTile(leading:const Icon(Icons.lock_outline,color:brand),title:const Text('Card Controls'),subtitle:const Text('Freeze, unfreeze and manage card (demo)'),onTap:()=>_cardMessage(context)),ListTile(leading:const Icon(Icons.local_offer,color:brand),title:const Text('Card Discounts'),onTap:()=>_cardMessage(context)),const Text('Real card issuance requires issuer/bank partner approval.',style:TextStyle(color:Colors.deepOrange))]));}}
+void _cardMessage(BuildContext c)=>ScaffoldMessenger.of(c).showSnackBar(const SnackBar(content:Text('Card feature preview only. No card is issued.')));
+
+class HelpScreen extends StatelessWidget { const HelpScreen({super.key}); @override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text('Help & Support')),body:ListView(padding:const EdgeInsets.all(16),children:[const Text('How can we help you?',style:TextStyle(fontSize:24,fontWeight:FontWeight.bold)),const SizedBox(height:8),const Text('Please select from the options below'),const SizedBox(height:16),...['Register New Complaint','Track My Complaint','Register New Service Request','Track My Service Request','Record Feedback','Vouchers','Terms and Conditions','Schedule of Charges','FAQs','APNA PAY Help'].map((e)=>Card(child:ListTile(leading:const Icon(Icons.support_agent,color:brand),title:Text(e),trailing:const Icon(Icons.arrow_forward),onTap:()=>_helpAction(context,e))))]));}}
+void _helpAction(BuildContext c,String title){final ctrl=TextEditingController();showDialog(context:c,builder:(d)=>AlertDialog(title:Text(title),content:TextField(controller:ctrl,maxLines:3,decoration:const InputDecoration(hintText:'Enter details (demo)')),actions:[TextButton(onPressed:()=>Navigator.pop(d),child:const Text('Cancel')),FilledButton(onPressed:(){Navigator.pop(d);ScaffoldMessenger.of(c).showSnackBar(SnackBar(content:Text('$title saved locally in demo only.')));},child:const Text('Submit Demo'))]));}
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
