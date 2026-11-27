@@ -494,6 +494,7 @@ void _cardMessage(BuildContext c)=>ScaffoldMessenger.of(c).showSnackBar(const Sn
 
 class HelpScreen extends StatelessWidget { const HelpScreen({super.key}); @override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text('Help & Support')),body:ListView(padding:const EdgeInsets.all(16),children:[const Text('How can we help you?',style:TextStyle(fontSize:24,fontWeight:FontWeight.bold)),const SizedBox(height:8),const Text('Please select from the options below'),const SizedBox(height:16),...['Register New Complaint','Track My Complaint','Register New Service Request','Track My Service Request','Record Feedback','Vouchers','Terms and Conditions','Schedule of Charges','FAQs','APNA PAY Help'].map((e)=>Card(child:ListTile(leading:const Icon(Icons.support_agent,color:brand),title:Text(e),trailing:const Icon(Icons.arrow_forward),onTap:()=>_helpAction(context,e))))]));}
 void _helpAction(BuildContext c,String title){final ctrl=TextEditingController();showDialog(context:c,builder:(d)=>AlertDialog(title:Text(title),content:TextField(controller:ctrl,maxLines:3,decoration:const InputDecoration(hintText:'Enter details (demo)')),actions:[TextButton(onPressed:()=>Navigator.pop(d),child:const Text('Cancel')),FilledButton(onPressed:(){Navigator.pop(d);ScaffoldMessenger.of(c).showSnackBar(SnackBar(content:Text('$title saved locally in demo only.')));},child:const Text('Submit Demo'))]));}
+}
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
