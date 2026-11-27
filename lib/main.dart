@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:local_auth/local_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(const ApnaPayDemo());
 
@@ -114,93 +112,14 @@ class LoginScreen extends StatefulWidget {
 }
 class _LoginScreenState extends State<LoginScreen> {
   final phone = TextEditingController(), pin = TextEditingController();
-  final LocalAuthentication auth = LocalAuthentication();
-  bool biometricEnabled = false;
-  bool checking = true;
-  @override void initState() { super.initState(); _loadBiometric(); }
-  Future<void> _loadBiometric() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!mounted) return;
-    setState(() { biometricEnabled = prefs.getBool('apna_biometric_enabled') ?? false; checking = false; });
-  }
-  Future<void> _biometricLogin() async {
-    try {
-      final supported = await auth.isDeviceSupported();
-      final canCheck = await auth.canCheckBiometrics;
-      if (!supported || !canCheck) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Biometric authentication is not available on this device. Use your demo PIN.')));
-        return;
-      }
-      final ok = await auth.authenticate(localizedReason: 'Authenticate to open your APNA PAY demo wallet');
-      if (ok && mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
-    } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Biometric login unavailable: $e')));
-    }
-  }
   @override Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('Demo Login')),
     body: Padding(padding: const EdgeInsets.all(20), child: Column(children: [
-      TextField(controller: phone, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Mobile Number')),
+      TextField(controller: phone, decoration: const InputDecoration(labelText: 'Mobile Number')),
       const SizedBox(height: 14),
       TextField(controller: pin, obscureText: true, decoration: const InputDecoration(labelText: 'Demo PIN')),
       const SizedBox(height: 20),
-      if (!checking && biometricEnabled) ...[
-        SizedBox(width: double.infinity, child: OutlinedButton.icon(onPressed: _biometricLogin, icon: const Icon(Icons.fingerprint), label: const Text('Login with Fingerprint / Face'))),
-        const SizedBox(height: 8),
-      ],
-      SizedBox(width: double.infinity, child: FilledButton(onPressed: () {
-        if (phone.text.trim().isEmpty || pin.text.trim().isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enter your mobile number and demo PIN.'))); return;
-        }
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
-      }, child: const Text('Login with Demo PIN'))),
-      const SizedBox(height: 12),
-      const Text('Demo login only. Real mobile OTP and server-side account verification are not connected.', style: TextStyle(color: Colors.deepOrange)),
-    ])),
-  );
-}
-
-class BiometricSetupScreen extends StatefulWidget {
-  const BiometricSetupScreen({super.key});
-  @override State<BiometricSetupScreen> createState() => _BiometricSetupScreenState();
-}
-class _BiometricSetupScreenState extends State<BiometricSetupScreen> {
-  final LocalAuthentication auth = LocalAuthentication();
-  bool busy = false;
-  Future<void> _enable() async {
-    setState(() => busy = true);
-    try {
-      final supported = await auth.isDeviceSupported();
-      final canCheck = await auth.canCheckBiometrics;
-      if (!supported || !canCheck) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('This device does not currently support biometric login. You can continue with your demo PIN.')));
-        return;
-      }
-      final ok = await auth.authenticate(localizedReason: 'Verify your fingerprint or face to enable APNA PAY quick login');
-      if (ok) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('apna_biometric_enabled', true);
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Biometric login enabled on this device.')));
-        _continue();
-      }
-    } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not enable biometrics: $e')));
-    } finally { if (mounted) setState(() => busy = false); }
-  }
-  void _continue() { Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const HomeScreen()), (r) => false); }
-  @override Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Secure Login')),
-    body: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      const Icon(Icons.fingerprint, size: 86, color: brand),
-      const SizedBox(height: 18),
-      const Text('Enable Fingerprint / Face Unlock', textAlign: TextAlign.center, style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
-      const SizedBox(height: 12),
-      const Text('Use your phone’s built-in biometric security for quicker future logins. APNA PAY does not collect or store your fingerprint or face data.', textAlign: TextAlign.center),
-      const SizedBox(height: 28),
-      FilledButton.icon(onPressed: busy ? null : _enable, icon: const Icon(Icons.verified_user), label: Text(busy ? 'Please wait...' : 'Enable Biometric Login')),
-      TextButton(onPressed: busy ? null : _continue, child: const Text('Skip — use Demo PIN instead')),
-      const SizedBox(height: 12),
-      const Text('Prototype only: real OTP verification and production account security still need backend integration.', textAlign: TextAlign.center, style: TextStyle(color: Colors.deepOrange)),
+      FilledButton(onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen())), child: const Text('Open Demo Wallet')),
     ])),
   );
 }
@@ -266,9 +185,9 @@ class _KycScreenState extends State<KycScreen> {
             return;
           }
           data.updateKyc('Demo Submitted – Not Verified');
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const BiometricSetupScreen()), (r) => false);
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const HomeScreen()), (r) => false);
         }, child: const Text('Submit Demo KYC')),
-      TextButton(onPressed: () => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const BiometricSetupScreen()), (r) => false), child: const Text('Skip for now')),
+      TextButton(onPressed: () => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const HomeScreen()), (r) => false), child: const Text('Skip for now')),
     ]),
   );
 
@@ -291,13 +210,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int tab = 0;
   @override Widget build(BuildContext context) {
-    final pages = [const Dashboard(), const HistoryScreen(), const ProfileScreen()];
+    final pages = [const Dashboard(), const HistoryScreen(), const QuickActionsScreen(), const CardsScreen(), const HelpScreen()];
     return Scaffold(
       body: pages[tab],
       bottomNavigationBar: NavigationBar(selectedIndex: tab, onDestinationSelected: (v) => setState(() => tab = v), destinations: const [
-        NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
-        NavigationDestination(icon: Icon(Icons.history), label: 'History'),
-        NavigationDestination(icon: Icon(Icons.person_outline), label: 'Account'),
+        NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
+        NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Activity'),
+        NavigationDestination(icon: Icon(Icons.qr_code_scanner), label: 'Pay'),
+        NavigationDestination(icon: Icon(Icons.credit_card), label: 'Cards'),
+        NavigationDestination(icon: Icon(Icons.support_agent), label: 'Help'),
       ]),
     );
   }
@@ -307,39 +228,31 @@ class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
   @override Widget build(BuildContext context) => AnimatedBuilder(animation: data, builder: (_, __) => Scaffold(
     body: SafeArea(child: ListView(padding: const EdgeInsets.only(bottom: 24), children: [
-      Container(padding: const EdgeInsets.fromLTRB(20, 24, 20, 32), decoration: const BoxDecoration(color: brand, borderRadius: BorderRadius.vertical(bottom: Radius.circular(28))), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [const Expanded(child: Text('APNA PAY', style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.w900))), IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none, color: Colors.white))]),
-        Text('Assalam-o-Alaikum, ${data.fullName.isEmpty ? "User" : data.fullName}', style: const TextStyle(color: Colors.white, fontSize: 17)),
-        const SizedBox(height: 20), const Text('Demo Wallet Balance', style: TextStyle(color: Colors.white70)),
-        Text('Rs. ${data.balance.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.bold)),
+      Padding(padding: const EdgeInsets.fromLTRB(18, 14, 18, 10), child: Row(children: [
+        const Expanded(child: Text('APNA PAY', style: TextStyle(color: brand, fontSize: 25, fontWeight: FontWeight.w900))),
+        IconButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpScreen())), icon: const Icon(Icons.notifications_none)),
+        const CircleAvatar(backgroundColor: brand, child: Text('AP', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
       ])),
-      Padding(padding: const EdgeInsets.fromLTRB(18, 18, 18, 8), child: Row(children: [
-        Expanded(child: _action(context, Icons.send, 'Send Money', () => _amount(context, 'Send Money (Demo)', false))),
-        Expanded(child: _action(context, Icons.phone_android, 'Mobile Load', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MobileLoadScreen())))),
-        Expanded(child: _action(context, Icons.receipt_long, 'Bill Pay', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BillPayScreen())))),
-        Expanded(child: _action(context, Icons.add_card, 'Add Money', () => _amount(context, 'Add Demo Money', true))),
+      Container(margin: const EdgeInsets.symmetric(horizontal: 16), padding: const EdgeInsets.all(22), decoration: BoxDecoration(color: brand, borderRadius: BorderRadius.circular(22)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Assalam-o-Alaikum, ${data.fullName.isEmpty ? "User" : data.fullName}', style: const TextStyle(color: Colors.white, fontSize: 16)),
+        const SizedBox(height: 18), const Text('Available Demo Balance', style: TextStyle(color: Colors.white70)),
+        Text('Rs. ${data.balance.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8), const Text('DEMO WALLET • No real funds', style: TextStyle(color: Colors.white70, fontSize: 11)),
       ])),
-      Padding(padding: const EdgeInsets.fromLTRB(18, 8, 18, 12), child: Row(children: [
-        Expanded(child: _action(context, Icons.account_balance, 'Govt Fees', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BillPayScreen())))),
-        Expanded(child: _action(context, Icons.school, 'Education Fee', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BillPayScreen())))),
-        Expanded(child: _action(context, Icons.wifi, 'Packages', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MobileLoadScreen())))),
-        Expanded(child: _action(context, Icons.history, 'History', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryScreen())))),
+      Padding(padding: const EdgeInsets.fromLTRB(16, 20, 16, 8), child: Row(children: [
+        Expanded(child: _action(context, Icons.send_rounded, 'Send Money', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SendMoneyScreen())))),
+        Expanded(child: _action(context, Icons.account_balance_wallet, 'Add Money', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AddMoneyScreen())))),
+        Expanded(child: _action(context, Icons.phone_android, 'Mobile Loads', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MobileLoadScreen())))),
+        Expanded(child: _action(context, Icons.receipt_long, 'Bill Payment', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BillPayScreen())))),
       ])),
-      Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: Card(child: ListTile(
-        leading: const CircleAvatar(backgroundColor: Color(0xFFE1F4EA), child: Icon(Icons.verified_user, color: brand)),
-        title: const Text('KYC Status'), subtitle: Text(data.kycStatus),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KycScreen())),
-      ))),
+      Padding(padding: const EdgeInsets.fromLTRB(16, 8, 16, 8), child: Card(child: ListTile(leading: const Icon(Icons.payments_outlined, color: brand), title: const Text('Payments & Services'), subtitle: const Text('Electricity • Gas • Water • Internet • Government fees'), trailing: const Icon(Icons.chevron_right), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PaymentsScreen()))))),
+      Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Card(child: ListTile(leading: const CircleAvatar(backgroundColor: Color(0xFFE1F4EA), child: Icon(Icons.verified_user, color: brand)), title: const Text('KYC Status'), subtitle: Text(data.kycStatus), trailing: const Icon(Icons.chevron_right), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KycScreen()))))),
       const Padding(padding: EdgeInsets.fromLTRB(20, 14, 20, 8), child: Text('Recent Activity', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
       ...data.activity.take(5).map((e) => ListTile(leading: const CircleAvatar(child: Icon(Icons.swap_horiz)), title: Text(e), subtitle: const Text('Demo record'))),
       const Padding(padding: EdgeInsets.all(16), child: Text('DEMO ONLY — no real money transfer, bill payment or identity verification.', textAlign: TextAlign.center, style: TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.w600))),
     ])),
   ));
-  Widget _action(BuildContext c, IconData icon, String title, VoidCallback tap) => InkWell(onTap: tap, child: Column(children: [
-    CircleAvatar(radius: 25, backgroundColor: const Color(0xFFE3F5EB), child: Icon(icon, color: brand)),
-    const SizedBox(height: 7), Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
-  ]));
+  Widget _action(BuildContext c, IconData icon, String title, VoidCallback tap) => InkWell(onTap: tap, child: Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Column(children: [CircleAvatar(radius: 25, backgroundColor: const Color(0xFFE3F5EB), child: Icon(icon, color: brand)), const SizedBox(height: 7), Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600))])));
 }
 
 void _amount(BuildContext context, String title, bool credit) {
@@ -519,6 +432,69 @@ class _BillPayScreenState extends State<BillPayScreen> {
   );
 }
 
+
+class SendMoneyScreen extends StatefulWidget { const SendMoneyScreen({super.key}); @override State<SendMoneyScreen> createState()=>_SendMoneyScreenState(); }
+class _SendMoneyScreenState extends State<SendMoneyScreen> {
+  final phone=TextEditingController(), amount=TextEditingController(); String bank='APNA PAY Wallet';
+  final banks=['APNA PAY Wallet','JazzCash','Easypaisa','HBL','UBL','Meezan Bank','Allied Bank','Bank Alfalah','Other Bank'];
+  @override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text('Send Money')),body:ListView(padding:const EdgeInsets.all(20),children:[
+    const Text('New Transfer',style:TextStyle(fontSize:22,fontWeight:FontWeight.bold)),const SizedBox(height:14),TextField(controller:phone,keyboardType:TextInputType.phone,decoration:const InputDecoration(labelText:'Mobile / Account Number',prefixIcon:Icon(Icons.contact_phone))),const SizedBox(height:18),const Text('Search Bank / Select Bank',style:TextStyle(fontWeight:FontWeight.w600)),const SizedBox(height:8),DropdownButtonFormField<String>(value:bank,items:banks.map((b)=>DropdownMenuItem(value:b,child:Text(b))).toList(),onChanged:(v)=>setState(()=>bank=v!),decoration:const InputDecoration(prefixIcon:Icon(Icons.account_balance))),const SizedBox(height:18),TextField(controller:amount,keyboardType:TextInputType.number,decoration:const InputDecoration(labelText:'Amount (PKR)',prefixText:'Rs. ')),const SizedBox(height:22),FilledButton(onPressed:(){final v=double.tryParse(amount.text);if(phone.text.trim().length<8||v==null||v<=0){ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('Enter a valid account number and amount.')));return;}if(v>data.balance){ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('Insufficient demo balance.')));return;}data.add('Send Money • $bank • ${phone.text.trim()}',v);ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('Demo transfer recorded only. No money was sent.')));Navigator.pop(context);},child:const Text('Confirm Demo Transfer')),const SizedBox(height:10),const Text('Real transfers require AFT / bank / wallet partner APIs and regulatory approval.',style:TextStyle(color:Colors.deepOrange))]));
+}
+
+class AddMoneyScreen extends StatefulWidget { const AddMoneyScreen({super.key}); @override State<AddMoneyScreen> createState()=>_AddMoneyScreenState(); }
+class _AddMoneyScreenState extends State<AddMoneyScreen>{
+  final amount=TextEditingController();
+  void _message(String title,String detail){showDialog(context:context,builder:(d)=>AlertDialog(title:Text(title),content:Text(detail),actions:[TextButton(onPressed:()=>Navigator.pop(d),child:const Text('Close'))]));}
+  void _addDemoCash(){final v=double.tryParse(amount.text);if(v==null||v<=0){ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('Enter a valid amount.')));return;}data.add('Add Cash • Demo Deposit',v,credit:true);ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('Demo cash added locally. No bank/card payment occurred.')));Navigator.pop(context);}
+  @override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text('Add Cash')),body:ListView(padding:const EdgeInsets.all(20),children:[
+    const Text('Choose a method and add cash to your wallet',style:TextStyle(fontSize:18,fontWeight:FontWeight.w700,color:brand)),
+    const SizedBox(height:20),
+    Card(elevation:2,child:Padding(padding:const EdgeInsets.all(16),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+      const Text('Your APNA PAY account number',style:TextStyle(color:Colors.black54,fontWeight:FontWeight.w600)),
+      const SizedBox(height:5),const Text('Available after partner onboarding',style:TextStyle(color:brand,fontWeight:FontWeight.bold)),
+      const Divider(height:24),const Text('Your APNA PAY IBAN',style:TextStyle(color:Colors.black54,fontWeight:FontWeight.w600)),
+      const SizedBox(height:5),const Text('Not issued in demo mode',style:TextStyle(color:brand,fontWeight:FontWeight.bold)),
+    ]))),
+    const SizedBox(height:16),
+    _cashOption(Icons.atm,'Search Cash Deposit Machine','Find a nearby cash deposit machine (demo preview)',()=>_message('Cash Deposit Machine','Machine locations will appear after an authorized banking partner provides its service/API.')),
+    _cashOption(Icons.account_balance,'Link Your Bank Account','Connect a bank account securely (demo preview)',()=>_message('Link Your Bank Account','Bank account linking requires a supported bank/Open Banking partner and secure authorization. No bank details are collected in this demo.')),
+    _cashOption(Icons.credit_card,'Link any Debit/Credit Card','Add a card through a secure provider (demo preview)',()=>_message('Link Debit/Credit Card','Card tokenization and payments require an approved payment gateway. Do not enter card details in this demo.')),
+    const SizedBox(height:18),
+    const Text('Demo cash amount',style:TextStyle(fontSize:18,fontWeight:FontWeight.bold)),const SizedBox(height:8),
+    TextField(controller:amount,keyboardType:TextInputType.number,decoration:const InputDecoration(labelText:'Amount (PKR)',prefixText:'Rs. ')),
+    const SizedBox(height:14),FilledButton(onPressed:_addDemoCash,child:const Text('Add Demo Cash')),
+    const SizedBox(height:10),const Text('DEMO ONLY: Account number, IBAN, bank linking, card funding and cash-deposit confirmation are not active. Real deposits require an authorized bank/payment partner.',style:TextStyle(color:Colors.deepOrange)),
+  ]));}
+  Widget _cashOption(IconData icon,String title,String subtitle,VoidCallback onTap)=>Card(child:ListTile(contentPadding:const EdgeInsets.symmetric(horizontal:14,vertical:8),leading:CircleAvatar(backgroundColor:const Color(0xFFE3F5EB),child:Icon(icon,color:brand)),title:Text(title,style:const TextStyle(fontWeight:FontWeight.w700)),subtitle:Text(subtitle),trailing:const Icon(Icons.chevron_right),onTap:onTap));
+}
+
+class PaymentsScreen extends StatefulWidget { const PaymentsScreen({super.key}); @override State<PaymentsScreen> createState()=>_PaymentsScreenState(); }
+class _PaymentsScreenState extends State<PaymentsScreen>{
+  final search=TextEditingController();
+  final groups=<String,List<String>>{
+    'Payments':['Electricity','Gas','Water','Telephone','My Bills','MTAG','Multiple Bills','Split Bill'],
+    'Education Payments':['School Fees','University Fees','Colleges','Entry Test & Board Fees'],
+    'Government Payments':['Government Fees','Passport Fee','NADRA Fee','Traffic E-Challan','FBR / PSID','Vehicle Token Tax','Driving Licence Fee'],
+    'Lifestyle & Other':['Internet','Insurance','E-commerce','Travel','Investment','Real Estate','Leisure','Credit Card','Food','Corporate','Financial Services','Hotels'],
+  };
+  @override Widget build(BuildContext context){final q=search.text.toLowerCase();return Scaffold(appBar:AppBar(title:const Text('Payments')),body:ListView(padding:const EdgeInsets.all(16),children:[
+    const Text('All your payments in one place!',style:TextStyle(fontSize:18,fontWeight:FontWeight.w700)),const SizedBox(height:16),
+    TextField(controller:search,onChanged:(_)=>setState((){}),decoration:const InputDecoration(hintText:'Search by Biller Name or Category',prefixIcon:Icon(Icons.search))),const SizedBox(height:14),
+    Card(shape:RoundedRectangleBorder(side:const BorderSide(color:brand),borderRadius:BorderRadius.circular(14)),child:ListTile(leading:const Icon(Icons.receipt_long,color:brand),title:const Text('My Bills'),trailing:const Icon(Icons.chevron_right),onTap:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const BillPayScreen())))),
+    ...groups.entries.map((entry){final items=entry.value.where((e)=>e.toLowerCase().contains(q)).toList();if(items.isEmpty)return const SizedBox.shrink();return Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Padding(padding:const EdgeInsets.only(top:22,bottom:12),child:Text(entry.key,style:const TextStyle(fontSize:19,fontWeight:FontWeight.bold))),GridView.builder(shrinkWrap:true,physics:const NeverScrollableScrollPhysics(),itemCount:items.length,gridDelegate:const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount:4,childAspectRatio:.82,crossAxisSpacing:8,mainAxisSpacing:12),itemBuilder:(context,i){final e=items[i];return InkWell(onTap:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const BillPayScreen())),child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[CircleAvatar(radius:25,backgroundColor:const Color(0xFFE3F5EB),child:Icon(_icon(e),color:brand)),const SizedBox(height:7),Text(e,textAlign:TextAlign.center,style:const TextStyle(fontSize:11,fontWeight:FontWeight.w600))]));})]);}),
+    const SizedBox(height:12),const Text('Service availability depends on an approved biller/payment partner. These are demo navigation screens; no real bill is paid.',style:TextStyle(color:Colors.deepOrange)),
+  ]));}
+}
+IconData _icon(String s){if(s.contains('Electric'))return Icons.bolt;if(s=='Gas')return Icons.local_fire_department;if(s=='Water')return Icons.water_drop;if(s.contains('Fees'))return Icons.school;if(s.contains('Internet'))return Icons.wifi;if(s.contains('Telephone'))return Icons.phone;return Icons.receipt_long;}
+
+class QuickActionsScreen extends StatelessWidget { const QuickActionsScreen({super.key}); @override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text('Pay & Scan')),body:ListView(padding:const EdgeInsets.all(20),children:[const Icon(Icons.qr_code_scanner,size:90,color:brand),const Text('Scan & Pay',textAlign:TextAlign.center,style:TextStyle(fontSize:24,fontWeight:FontWeight.bold)),const SizedBox(height:8),const Text('QR payment preview. Camera and merchant payment network are not connected.',textAlign:TextAlign.center),const SizedBox(height:22),FilledButton(onPressed:()=>ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('QR payments will be enabled after partner integration.'))),child:const Text('Open QR Scanner (Demo)')),const SizedBox(height:12),OutlinedButton(onPressed:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>const SendMoneyScreen())),child:const Text('Send Money'))]));}}
+
+class CardsScreen extends StatelessWidget { const CardsScreen({super.key}); @override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text('APNA PAY Cards')),body:ListView(padding:const EdgeInsets.all(20),children:[Container(height:190,padding:const EdgeInsets.all(22),decoration:BoxDecoration(gradient:const LinearGradient(colors:[Color(0xFF16B879),Color(0xFF07583C)]),borderRadius:BorderRadius.circular(20)),child:const Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text('APNA PAY',style:TextStyle(color:Colors.white,fontSize:24,fontWeight:FontWeight.bold)),Spacer(),Icon(Icons.contactless,color:Colors.white,size:34),Spacer(),Text('DEMO CARD • **** **** **** 0000',style:TextStyle(color:Colors.white,fontWeight:FontWeight.bold))])),const SizedBox(height:20),const Text('Card services',style:TextStyle(fontSize:20,fontWeight:FontWeight.bold)),ListTile(leading:const Icon(Icons.credit_card,color:brand),title:const Text('Order Debit Card'),subtitle:const Text('Physical / Virtual card (preview)'),onTap:()=>_cardMessage(context)),ListTile(leading:const Icon(Icons.lock_outline,color:brand),title:const Text('Card Controls'),subtitle:const Text('Freeze, unfreeze and manage card (demo)'),onTap:()=>_cardMessage(context)),ListTile(leading:const Icon(Icons.local_offer,color:brand),title:const Text('Card Discounts'),onTap:()=>_cardMessage(context)),const Text('Real card issuance requires issuer/bank partner approval.',style:TextStyle(color:Colors.deepOrange))]));}}
+void _cardMessage(BuildContext c)=>ScaffoldMessenger.of(c).showSnackBar(const SnackBar(content:Text('Card feature preview only. No card is issued.')));
+
+class HelpScreen extends StatelessWidget { const HelpScreen({super.key}); @override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text('Help & Support')),body:ListView(padding:const EdgeInsets.all(16),children:[const Text('How can we help you?',style:TextStyle(fontSize:24,fontWeight:FontWeight.bold)),const SizedBox(height:8),const Text('Please select from the options below'),const SizedBox(height:16),...['Register New Complaint','Track My Complaint','Register New Service Request','Track My Service Request','Record Feedback','Vouchers','Terms and Conditions','Schedule of Charges','FAQs','APNA PAY Help'].map((e)=>Card(child:ListTile(leading:const Icon(Icons.support_agent,color:brand),title:Text(e),trailing:const Icon(Icons.arrow_forward),onTap:()=>_helpAction(context,e))))]));}}
+void _helpAction(BuildContext c,String title){final ctrl=TextEditingController();showDialog(context:c,builder:(d)=>AlertDialog(title:Text(title),content:TextField(controller:ctrl,maxLines:3,decoration:const InputDecoration(hintText:'Enter details (demo)')),actions:[TextButton(onPressed:()=>Navigator.pop(d),child:const Text('Cancel')),FilledButton(onPressed:(){Navigator.pop(d);ScaffoldMessenger.of(c).showSnackBar(SnackBar(content:Text('$title saved locally in demo only.')));},child:const Text('Submit Demo'))]));}
+
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
   @override Widget build(BuildContext context) => AnimatedBuilder(animation: data, builder: (_, __) => Scaffold(
@@ -537,7 +513,7 @@ class ProfileScreen extends StatelessWidget {
       Text(data.phone, textAlign: TextAlign.center),
       const SizedBox(height: 20),
       ListTile(leading: const Icon(Icons.verified_user), title: const Text('KYC'), subtitle: Text(data.kycStatus)),
-      ListTile(leading: const Icon(Icons.fingerprint), title: const Text('Biometric Login'), subtitle: const Text('Fingerprint / Face Unlock on supported devices'), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BiometricSetupScreen()))),
+      const ListTile(leading: Icon(Icons.security), title: Text('Security'), subtitle: Text('Demo PIN only')),
       const ListTile(leading: Icon(Icons.language), title: Text('Language'), subtitle: Text('English • Urdu planned')),
       const ListTile(leading: Icon(Icons.info_outline), title: Text('Version'), subtitle: Text('APNA PAY Demo 1.0')),
       const Text('This is a prototype. Do not use real identity or payment details.', style: TextStyle(color: Colors.deepOrange)),
