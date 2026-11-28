@@ -1,4 +1,4 @@
-                  import 'dart:io';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -9,6 +9,7 @@ const ink = Color(0xFF12372B);
 
 class ApnaPayDemo extends StatelessWidget {
   const ApnaPayDemo({super.key});
+
   @override
   Widget build(BuildContext context) => MaterialApp(
     debugShowCheckedModeBanner: false,
@@ -17,7 +18,10 @@ class ApnaPayDemo extends StatelessWidget {
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(seedColor: brand),
       scaffoldBackgroundColor: const Color(0xFFF5F8F6),
-      appBarTheme: const AppBarTheme(backgroundColor: brand, foregroundColor: Colors.white),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: brand,
+        foregroundColor: Colors.white,
+      ),
       inputDecorationTheme: const InputDecorationTheme(
         border: OutlineInputBorder(),
         filled: true,
@@ -33,108 +37,255 @@ class DemoData extends ChangeNotifier {
   String phone = '';
   String cnic = '';
   String kycStatus = 'Not Submitted';
+
   double balance = 25000;
-  final List<String> activity = ['Welcome to APNA PAY Demo'];
+
+  final List<String> activity = [
+    'Welcome to APNA PAY Demo'
+  ];
+
   void add(String label, double amount, {bool credit = false}) {
     if (!credit && amount > balance) return;
+
     balance += credit ? amount : -amount;
     activity.insert(0, label);
     notifyListeners();
   }
-  void updateKyc(String status) { kycStatus = status; notifyListeners(); }
+
+  void updateKyc(String status) {
+    kycStatus = status;
+    notifyListeners();
+  }
 }
+
 final data = DemoData();
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) => Scaffold(
-    body: SafeArea(child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        const Spacer(),
-        const Icon(Icons.account_balance_wallet_rounded, size: 88, color: brand),
-        const SizedBox(height: 12),
-        const Text('APNA PAY', textAlign: TextAlign.center, style: TextStyle(fontSize: 38, fontWeight: FontWeight.w900, color: brand)),
-        const Text('Your Money, Your Way', textAlign: TextAlign.center, style: TextStyle(color: Colors.black54)),
-        const SizedBox(height: 38),
-        const Text('Welcome', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: ink)),
-        const SizedBox(height: 8),
-        const Text('Start with a demo account. No real money or identity verification is processed.'),
-        const SizedBox(height: 24),
-        FilledButton(
-          style: FilledButton.styleFrom(backgroundColor: brand, padding: const EdgeInsets.all(17)),
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegistrationScreen())),
-          child: const Text('Create Demo Account'),
+    body: SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Spacer(),
+
+            const Icon(
+              Icons.account_balance_wallet_rounded,
+              size: 88,
+              color: brand,
+            ),
+
+            const SizedBox(height: 12),
+
+            const Text(
+              'APNA PAY',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 38,
+                fontWeight: FontWeight.w900,
+                color: brand,
+              ),
+            ),
+
+            const Text(
+              'Your Money, Your Way',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.black54),
+            ),
+
+            const SizedBox(height: 38),
+
+            const Text(
+              'Welcome',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: ink,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            const Text(
+              'Start with a demo account. No real money or identity verification is processed.',
+            ),
+
+            const SizedBox(height: 24),
+
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: brand,
+                padding: const EdgeInsets.all(17),
+              ),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const RegistrationScreen(),
+                ),
+              ),
+              child: const Text('Create Demo Account'),
+            ),
+
+            TextButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const LoginScreen(),
+                ),
+              ),
+              child: const Text('I already have a demo account'),
+            ),
+
+            const Spacer(),
+
+            const Text(
+              'DEMO MODE • NOT A REAL WALLET',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.deepOrange,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
-        TextButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen())), child: const Text('I already have a demo account')),
-        const Spacer(),
-        const Text('DEMO MODE • NOT A REAL WALLET', textAlign: TextAlign.center, style: TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.bold)),
-      ]),
-    )),
+      ),
+    ),
   );
 }
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
-  @override State<RegistrationScreen> createState() => _RegistrationScreenState();
+
+  @override
+  State<RegistrationScreen> createState() =>
+      _RegistrationScreenState();
 }
+
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  final name = TextEditingController(), phone = TextEditingController(), email = TextEditingController(), pin = TextEditingController();
+  final name = TextEditingController();
+  final phone = TextEditingController();
+  final email = TextEditingController();
+  final pin = TextEditingController();
+
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('Create Account')),
-    body: ListView(padding: const EdgeInsets.all(20), children: [
-            const Text('Demo Registration', style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
-      const SizedBox(height: 6),
-      const Text('Use sample details only. Do not enter your real CNIC or banking PIN.'),
-      const SizedBox(height: 20),
-      _field(name, 'Full Name', Icons.person),
-      const SizedBox(height: 14),
-      _field(phone, 'Mobile Number', Icons.phone, type: TextInputType.phone),
-      const SizedBox(height: 14),
-      _field(email, 'Email (optional)', Icons.email, type: TextInputType.emailAddress),
-      const SizedBox(height: 14),
-      _field(pin, 'Create 4-digit Demo PIN', Icons.lock, obscure: true, type: TextInputType.number),
-      const SizedBox(height: 24),
-      FilledButton(
-        style: FilledButton.styleFrom(backgroundColor: brand, padding: const EdgeInsets.all(16)),
-        onPressed: () {
-          if (name.text.trim().isEmpty || phone.text.trim().length < 10 || pin.text.trim().length < 4) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Please enter name, valid mobile number and 4-digit demo PIN.')),
-            );
-            return;
-          }
-          data.fullName = name.text.trim();
-          data.phone = phone.text.trim();
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => const KycScreen()),
-            (r) => false,
-          );
-        },
-        child: const Text('Continue to KYC Demo'),
-      ),
-    ]),
-  );
 
-  Widget _field(
+    body: ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        const Text(
+          'Demo Registration',
+          style: TextStyle(
+            fontSize: 23,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
+        const SizedBox(height: 6),
+
+        const Text(
+          'Use sample details only. Do not enter your real CNIC or banking PIN.',
+        ),
+
+        const SizedBox(height: 20),
+
+        _field(name, 'Full Name', Icons.person),
+
+        const SizedBox(height: 14),
+
+        _field(
+          phone,
+          'Mobile Number',
+          Icons.phone,
+          type: TextInputType.phone,
+        ),
+
+        const SizedBox(height: 14),
+
+        _field(
+          email,
+          'Email (optional)',
+          Icons.email,
+          type: TextInputType.emailAddress,
+        ),
+
+        const SizedBox(height: 14),
+
+        _field(
+          pin,
+          'Create 4-digit Demo PIN',
+          Icons.lock,
+          obscure: true,
+          type: TextInputType.number,
+        ),
+
+        const SizedBox(height: 24),
+
+        FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: brand,
+            padding: const EdgeInsets.all(16),
+          ),
+
+          onPressed: () {
+            if (name.text.trim().isEmpty ||
+                phone.text.trim().length < 10 ||
+                pin.text.trim().length < 4) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Please enter name, valid mobile number and 4-digit demo PIN.',
+                  ),
+                ),
+              );
+              return;
+            }
+
+            data.fullName = name.text.trim();
+            data.phone = phone.text.trim();
+
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const KycScreen(),
+              ),
+              (r) => false,
+            );
+          },
+
+          child: const Text('Continue to KYC Demo'),
+        ),
+      ],
+    ),
+  );
+    Widget _field(
     TextEditingController c,
     String label,
     IconData icon, {
     bool obscure = false,
     TextInputType type = TextInputType.text,
-  }) => TextField(
-    controller: c,
-    obscureText: obscure,
-    keyboardType: type,
-    decoration: InputDecoration(labelText: label, prefixIcon: Icon(icon)),
-  );
+  }) {
+    return TextField(
+      controller: c,
+      obscureText: obscure,
+      keyboardType: type,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+      ),
+    );
+  }
 }
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -148,32 +299,59 @@ class _LoginScreenState extends State<LoginScreen> {
     appBar: AppBar(title: const Text('Demo Login')),
     body: Padding(
       padding: const EdgeInsets.all(20),
-      child: Column(children: [
-        TextField(
-          controller: phone,
-          decoration: const InputDecoration(labelText: 'Mobile Number'),
-        ),
-        const SizedBox(height: 14),
-        TextField(
-          controller: pin,
-          obscureText: true,
-          decoration: const InputDecoration(labelText: 'Demo PIN'),
-        ),
-        const SizedBox(height: 20),
-        FilledButton(
-          onPressed: () => Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
+      child: Column(
+        children: [
+          TextField(
+            controller: phone,
+            keyboardType: TextInputType.phone,
+            decoration: const InputDecoration(
+              labelText: 'Mobile Number',
+            ),
           ),
-          child: const Text('Open Demo Wallet'),
-        ),
-      ]),
+
+          const SizedBox(height: 14),
+
+          TextField(
+            controller: pin,
+            obscureText: true,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Demo PIN',
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          FilledButton(
+            onPressed: () {
+              if (phone.text.trim().isEmpty ||
+                  pin.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Enter mobile number and PIN.'),
+                  ),
+                );
+                return;
+              }
+
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const HomeScreen(),
+                ),
+              );
+            },
+            child: const Text('Open Demo Wallet'),
+          ),
+        ],
+      ),
     ),
   );
 }
 
 class KycScreen extends StatefulWidget {
   const KycScreen({super.key});
+
   @override
   State<KycScreen> createState() => _KycScreenState();
 }
@@ -186,7 +364,10 @@ class _KycScreenState extends State<KycScreen> {
   XFile? backImage;
   XFile? selfieImage;
 
-  Future<void> _pick(String kind, ImageSource source) async {
+  Future<void> _pick(
+    String kind,
+    ImageSource source,
+  ) async {
     try {
       final file = await picker.pickImage(
         source: source,
@@ -194,7 +375,7 @@ class _KycScreenState extends State<KycScreen> {
         maxWidth: 1600,
       );
 
-      if (file == null) return;
+      if (file == null || !mounted) return;
 
       setState(() {
         if (kind == 'front') frontImage = file;
@@ -203,8 +384,11 @@ class _KycScreenState extends State<KycScreen> {
       });
     } catch (e) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open image picker: $e')),
+        SnackBar(
+          content: Text('Could not open image picker: $e'),
+        ),
       );
     }
   }
@@ -213,71 +397,195 @@ class _KycScreenState extends State<KycScreen> {
     showModalBottomSheet(
       context: context,
       builder: (sheet) => SafeArea(
-        child: Wrap(children: [
-          ListTile(
-            leading: const Icon(Icons.photo_library),
-            title: const Text('Choose from Gallery'),
-            onTap: () {
-              Navigator.pop(sheet);
-              _pick(kind, ImageSource.gallery);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.camera_alt),
-            title: const Text('Take Photo'),
-            onTap: () {
-              Navigator.pop(sheet);
-              _pick(kind, ImageSource.camera);
-            },
-          ),
-        ]),
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Choose from Gallery'),
+              onTap: () {
+                Navigator.pop(sheet);
+                _pick(kind, ImageSource.gallery);
+              },
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Take Photo'),
+              onTap: () {
+                Navigator.pop(sheet);
+                _pick(kind, ImageSource.camera);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
-    @override
+
+  @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Identity Check – Demo')),
-    body: ListView(padding: const EdgeInsets.all(20), children: [
-      const Icon(Icons.verified_user_outlined, size: 58, color: brand),
-      const Text('KYC Verification Preview', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-      const SizedBox(height: 8),
-      const Text('Demo only: images are selected on this device for preview. They are not uploaded to NADRA or a verification server. Do not use real CNIC images in this demo.'),
-      const SizedBox(height: 20),
-      TextField(controller: cnic, keyboardType: TextInputType.number,
-        decoration: const InputDecoration(labelText: 'Sample CNIC (demo only)', hintText: '00000-0000000-0')),
-      const SizedBox(height: 16),
-      _imageCard('CNIC Front', frontImage, () => _chooseImage('front')),
-      _imageCard('CNIC Back', backImage, () => _chooseImage('back')),
-      _imageCard('Selfie Preview', selfieImage, () => _chooseImage('selfie')),
-      const SizedBox(height: 18),
-      FilledButton(style: FilledButton.styleFrom(backgroundColor: brand, padding: const EdgeInsets.all(16)),
-        onPressed: () {
-          if (frontImage == null || backImage == null) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select both CNIC front and back images for this demo.')));
-            return;
-          }
-          data.updateKyc('Demo Submitted – Not Verified');
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const HomeScreen()), (r) => false);
-        }, child: const Text('Submit Demo KYC')),
-      TextButton(onPressed: () => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const HomeScreen()), (r) => false), child: const Text('Skip for now')),
-    ]),
+    appBar: AppBar(
+      title: const Text('Identity Check – Demo'),
+    ),
+
+    body: ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        const Icon(
+          Icons.verified_user_outlined,
+          size: 58,
+          color: brand,
+        ),
+
+        const Text(
+          'KYC Verification Preview',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        const Text(
+          'Demo only: images are selected on this device for preview. They are not uploaded to NADRA or a verification server. Do not use real CNIC images in this demo.',
+        ),
+
+        const SizedBox(height: 20),
+
+        TextField(
+          controller: cnic,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: 'Sample CNIC (demo only)',
+            hintText: '00000-0000000-0',
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        _imageCard(
+          'CNIC Front',
+          frontImage,
+          () => _chooseImage('front'),
+        ),
+
+        _imageCard(
+          'CNIC Back',
+          backImage,
+          () => _chooseImage('back'),
+        ),
+
+        _imageCard(
+          'Selfie Preview',
+          selfieImage,
+          () => _chooseImage('selfie'),
+        ),
+
+        const SizedBox(height: 18),
+
+        FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: brand,
+            padding: const EdgeInsets.all(16),
+          ),
+
+          onPressed: () {
+            if (frontImage == null || backImage == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Please select both CNIC front and back images for this demo.',
+                  ),
+                ),
+              );
+              return;
+            }
+
+            data.updateKyc(
+              'Demo Submitted – Not Verified',
+            );
+
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const HomeScreen(),
+              ),
+              (r) => false,
+            );
+          },
+
+          child: const Text('Submit Demo KYC'),
+        ),
+
+        TextButton(
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const HomeScreen(),
+              ),
+              (r) => false,
+            );
+          },
+          child: const Text('Skip for now'),
+        ),
+      ],
+    ),
   );
 
-  Widget _imageCard(String title, XFile? file, VoidCallback onTap) => Card(
-    clipBehavior: Clip.antiAlias,
-    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      ListTile(leading: Icon(file == null ? Icons.add_a_photo : Icons.check_circle, color: brand),
-        title: Text(title), subtitle: Text(file == null ? 'Select from gallery or camera' : 'Image selected')),
-      if (file != null) Image.file(File(file.path), height: 170, fit: BoxFit.contain),
-      Padding(padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-        child: OutlinedButton.icon(onPressed: onTap, icon: const Icon(Icons.upload_file), label: Text(file == null ? 'Choose Image' : 'Change Image'))),
-    ]),
-  );
+  Widget _imageCard(
+    String title,
+    XFile? file,
+    VoidCallback onTap,
+  ) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ListTile(
+            leading: Icon(
+              file == null
+                  ? Icons.add_a_photo
+                  : Icons.check_circle,
+              color: brand,
+            ),
+            title: Text(title),
+            subtitle: Text(
+              file == null
+                  ? 'Select from gallery or camera'
+                  : 'Image selected',
+            ),
+          ),
+
+          if (file != null)
+            Image.file(
+              File(file.path),
+              height: 170,
+              fit: BoxFit.contain,
+            ),
+
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+            child: OutlinedButton.icon(
+              onPressed: onTap,
+              icon: const Icon(Icons.upload_file),
+              label: Text(
+                file == null ? 'Choose Image' : 'Change Image',
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
-  @override State<HomeScreen> createState() => _HomeScreenState();
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -290,20 +598,42 @@ class _HomeScreenState extends State<HomeScreen> {
       const HistoryScreen(),
       const QuickActionsScreen(),
       const CardsScreen(),
-      const HelpScreen()
+      const HelpScreen(),
     ];
 
     return Scaffold(
-      body: pages[tab],
+      body: IndexedStack(
+        index: tab,
+        children: pages,
+      ),
+
       bottomNavigationBar: NavigationBar(
         selectedIndex: tab,
-        onDestinationSelected: (v) => setState(() => tab = v),
+        onDestinationSelected: (v) {
+          setState(() => tab = v);
+        },
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Activity'),
-          NavigationDestination(icon: Icon(Icons.qr_code_scanner), label: 'Pay'),
-          NavigationDestination(icon: Icon(Icons.credit_card), label: 'Cards'),
-          NavigationDestination(icon: Icon(Icons.support_agent), label: 'Help'),
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.receipt_long),
+            label: 'Activity',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.qr_code_scanner),
+            label: 'Pay',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.credit_card),
+            label: 'Cards',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.support_agent),
+            label: 'Help',
+          ),
         ],
       ),
     );
@@ -314,164 +644,313 @@ class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
 
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(
-    animation: data,
-    builder: (_, __) => Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 24),
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 14, 18, 10),
-              child: Row(children: [
-                const Expanded(
-                  child: Text('APNA PAY',
-                    style: TextStyle(color: brand, fontSize: 25, fontWeight: FontWeight.w900)),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpScreen())),
-                  icon: const Icon(Icons.notifications_none),
-                ),
-                const CircleAvatar(
-                  backgroundColor: brand,
-                  child: Text('AP', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
-              ]),
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(color: brand, borderRadius: BorderRadius.circular(22)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Assalam-o-Alaikum, ${data.fullName.isEmpty ? "User" : data.fullName}',
-                    style: const TextStyle(color: Colors.white, fontSize: 16)),
-                  const SizedBox(height: 18),
-                  const Text('Available Demo Balance', style: TextStyle(color: Colors.white70)),
-                  Text('Rs. ${data.balance.toStringAsFixed(2)}',
-                    style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  const Text('DEMO WALLET • No real funds',
-                    style: TextStyle(color: Colors.white70, fontSize: 11)),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
-              child: Row(children: [
-                Expanded(child: _action(context, Icons.send_rounded, 'Send Money',
-                  () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SendMoneyScreen())))),
-                Expanded(child: _action(context, Icons.account_balance_wallet, 'Add Money',
-                  () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AddMoneyScreen())))),
-                Expanded(child: _action(context, Icons.phone_android, 'Mobile Loads',
-                  () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MobileLoadScreen())))),
-                Expanded(child: _action(context, Icons.receipt_long, 'Bill Payment',
-                  () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BillPayScreen())))),
-              ]),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: Card(
-                child: ListTile(
-                  leading: const Icon(Icons.payments_outlined, color: brand),
-                  title: const Text('Payments & Services'),
-                  subtitle: const Text('Electricity • Gas • Water • Internet • Government fees'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PaymentsScreen())),
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: data,
+      builder: (_, __) => Scaffold(
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.only(bottom: 24),
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 14, 18, 10),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'APNA PAY',
+                        style: TextStyle(
+                          color: brand,
+                          fontSize: 25,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ProfileScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.person_outline),
+                    ),
+
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const HelpScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.notifications_none),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Card(
-                child: ListTile(
-                  leading: const CircleAvatar(
-                    backgroundColor: Color(0xFFE1F4EA),
-                    child: Icon(Icons.verified_user, color: brand),
+
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  color: brand,
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Assalam-o-Alaikum, ${data.fullName.isEmpty ? "User" : data.fullName}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+
+                    const SizedBox(height: 18),
+
+                    const Text(
+                      'Available Demo Balance',
+                      style: TextStyle(color: Colors.white70),
+                    ),
+
+                    Text(
+                      'Rs. ${data.balance.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    const Text(
+                      'DEMO WALLET • No real funds',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const Padding(
+                padding: EdgeInsets.fromLTRB(20, 22, 20, 10),
+                child: Text(
+                  'Quick Services',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
-                  title: const Text('KYC Status'),
-                  subtitle: Text(data.kycStatus),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KycScreen())),
                 ),
               ),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _action(
+                        context,
+                        Icons.send_rounded,
+                        'Send Money',
+                        () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const SendMoneyScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    Expanded(
+                      child: _action(
+                        context,
+                        Icons.account_balance_wallet,
+                        'Add Money',
+                        () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const AddMoneyScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    Expanded(
+                      child: _action(
+                        context,
+                        Icons.phone_android,
+                        'Mobile Load',
+                        () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const MobileLoadScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    Expanded(
+                      child: _action(
+                        context,
+                        Icons.receipt_long,
+                        'Bill Payment',
+                        () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const PaymentsScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                child: Card(
+                  child: ListTile(
+                    leading: const CircleAvatar(
+                      backgroundColor: Color(0xFFE3F5EB),
+                      child: Icon(Icons.payments, color: brand),
+                    ),
+                    title: const Text(
+                      'Payments & Services',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: const Text(
+                      'Electricity • Gas • Water • Government Fees',
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PaymentsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Card(
+                  child: ListTile(
+                    leading: const CircleAvatar(
+                      backgroundColor: Color(0xFFE3F5EB),
+                      child: Icon(
+                        Icons.verified_user,
+                        color: brand,
+                      ),
+                    ),
+                    title: const Text('KYC Status'),
+                    subtitle: Text(data.kycStatus),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const KycScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              const Padding(
+                padding: EdgeInsets.fromLTRB(20, 18, 20, 8),
+                child: Text(
+                  'Recent Activity',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+
+              ...data.activity.take(5).map(
+                (e) => ListTile(
+                  leading: const CircleAvatar(
+                    child: Icon(Icons.swap_horiz),
+                  ),
+                  title: Text(e),
+                  subtitle: const Text('Demo transaction'),
+                ),
+              ),
+
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  'DEMO ONLY — no real money transfer, bill payment or identity verification.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.deepOrange,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _action(
+    BuildContext context,
+    IconData icon,
+    String title,
+    VoidCallback tap,
+  ) {
+    return InkWell(
+      onTap: tap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 25,
+              backgroundColor: const Color(0xFFE3F5EB),
+              child: Icon(icon, color: brand),
             ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 14, 20, 8),
-              child: Text('Recent Activity', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            ),
-            ...data.activity.take(5).map((e) => ListTile(
-              leading: const CircleAvatar(child: Icon(Icons.swap_horiz)),
-              title: Text(e),
-              subtitle: const Text('Demo record'),
-            )),
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: Text('DEMO ONLY — no real money transfer, bill payment or identity verification.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 7),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
       ),
-    ),
-  );
-
-  Widget _action(BuildContext c, IconData icon, String title, VoidCallback tap) =>
-    InkWell(
-      onTap: tap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(children: [
-          CircleAvatar(radius: 25, backgroundColor: const Color(0xFFE3F5EB), child: Icon(icon, color: brand)),
-          const SizedBox(height: 7),
-          Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
-        ]),
-      ),
     );
+  }
 }
-void _amount(BuildContext context, String title, bool credit) {
-  final amount = TextEditingController();
-
-  showDialog(
-    context: context,
-    builder: (d) => AlertDialog(
-      title: Text(title),
-      content: TextField(
-        controller: amount,
-        keyboardType: TextInputType.number,
-        decoration: const InputDecoration(labelText: 'Amount in PKR'),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(d),
-          child: const Text('Cancel'),
-        ),
-        FilledButton(
-          onPressed: () {
-            final v = double.tryParse(amount.text);
-            if (v == null || v <= 0) return;
-
-            if (!credit && v > data.balance) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Insufficient demo balance')),
-              );
-              return;
-            }
-
-            data.add(title, v, credit: credit);
-            Navigator.pop(d);
-          },
-          child: const Text('Confirm Demo'),
-        ),
-      ],
-    ),
-  );
-}
-
 class MobileLoadScreen extends StatefulWidget {
   const MobileLoadScreen({super.key});
+
   @override
   State<MobileLoadScreen> createState() => _MobileLoadScreenState();
 }
@@ -488,28 +967,28 @@ class _MobileLoadScreenState extends State<MobileLoadScreen> {
 
   final bundles = <String, List<Map<String, String>>>{
     'Jazz': [
-      {'name':'Daily Social Bundle', 'detail':'Social data • 1 day', 'price':'Rs. 50'},
-      {'name':'Weekly Social Bundle', 'detail':'Social apps • 7 days', 'price':'Rs. 150'},
-      {'name':'Monthly Social Bundle', 'detail':'Social apps • 30 days', 'price':'Rs. 500'},
-      {'name':'Monthly Data Bundle', 'detail':'Internet data • 30 days', 'price':'Rs. 1,000'},
+      {'name': 'Daily Social Bundle', 'detail': 'Social data • 1 day', 'price': '50'},
+      {'name': 'Weekly Social Bundle', 'detail': 'Social apps • 7 days', 'price': '150'},
+      {'name': 'Monthly Social Bundle', 'detail': 'Social apps • 30 days', 'price': '500'},
+      {'name': 'Monthly Data Bundle', 'detail': 'Internet data • 30 days', 'price': '1000'},
     ],
     'Zong': [
-      {'name':'Daily Social Package', 'detail':'Social data • 1 day', 'price':'Rs. 50'},
-      {'name':'Weekly Data Package', 'detail':'Internet data • 7 days', 'price':'Rs. 250'},
-      {'name':'Monthly Social Package', 'detail':'Social apps • 30 days', 'price':'Rs. 450'},
-      {'name':'Monthly Data Package', 'detail':'Internet data • 30 days', 'price':'Rs. 1,200'},
+      {'name': 'Daily Social Package', 'detail': 'Social data • 1 day', 'price': '50'},
+      {'name': 'Weekly Data Package', 'detail': 'Internet data • 7 days', 'price': '250'},
+      {'name': 'Monthly Social Package', 'detail': 'Social apps • 30 days', 'price': '450'},
+      {'name': 'Monthly Data Package', 'detail': 'Internet data • 30 days', 'price': '1200'},
     ],
     'Telenor': [
-      {'name':'Daily Social Pack', 'detail':'Social data • 1 day', 'price':'Rs. 60'},
-      {'name':'Weekly EasyCard', 'detail':'Calls, SMS and data • 7 days', 'price':'Rs. 300'},
-      {'name':'Monthly Social Pack', 'detail':'Social apps • 30 days', 'price':'Rs. 500'},
-      {'name':'Monthly EasyCard', 'detail':'Calls, SMS and data • 30 days', 'price':'Rs. 1,000'},
+      {'name': 'Daily Social Pack', 'detail': 'Social data • 1 day', 'price': '60'},
+      {'name': 'Weekly EasyCard', 'detail': 'Calls, SMS and data • 7 days', 'price': '300'},
+      {'name': 'Monthly Social Pack', 'detail': 'Social apps • 30 days', 'price': '500'},
+      {'name': 'Monthly EasyCard', 'detail': 'Calls, SMS and data • 30 days', 'price': '1000'},
     ],
     'Ufone': [
-      {'name':'Daily Light Package', 'detail':'Calls and data • 1 day', 'price':'Rs. 60'},
-      {'name':'Weekly Internet Package', 'detail':'Internet data • 7 days', 'price':'Rs. 250'},
-      {'name':'Monthly Social Package', 'detail':'Social apps • 30 days', 'price':'Rs. 450'},
-      {'name':'Monthly Super Card', 'detail':'Calls, SMS and data • 30 days', 'price':'Rs. 1,000'},
+      {'name': 'Daily Light Package', 'detail': 'Calls and data • 1 day', 'price': '60'},
+      {'name': 'Weekly Internet Package', 'detail': 'Internet data • 7 days', 'price': '250'},
+      {'name': 'Monthly Social Package', 'detail': 'Social apps • 30 days', 'price': '450'},
+      {'name': 'Monthly Super Card', 'detail': 'Calls, SMS and data • 30 days', 'price': '1000'},
     ],
   };
 
@@ -519,8 +998,11 @@ class _MobileLoadScreenState extends State<MobileLoadScreen> {
     body: ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const Text('Select Network',
-          style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold)),
+        const Text(
+          'Select Network',
+          style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+        ),
+
         const SizedBox(height: 12),
 
         Wrap(
@@ -532,11 +1014,8 @@ class _MobileLoadScreenState extends State<MobileLoadScreen> {
             onSelected: (_) => setState(() {
               network = n;
               selectedBundle = '';
+              amount.clear();
             }),
-            selectedColor: const Color(0xFFD9F3E5),
-            side: BorderSide(
-              color: network == n ? brand : Colors.grey.shade400,
-            ),
           )).toList(),
         ),
 
@@ -559,6 +1038,7 @@ class _MobileLoadScreenState extends State<MobileLoadScreen> {
           onSelectionChanged: (v) => setState(() {
             mode = v.first;
             selectedBundle = '';
+            amount.clear();
           }),
         ),
 
@@ -586,8 +1066,12 @@ class _MobileLoadScreenState extends State<MobileLoadScreen> {
           ),
         ] else ...[
           const SizedBox(height: 18),
-          const Text('Available Demo Packages',
-            style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
+
+          const Text(
+            'Available Demo Packages',
+            style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
+          ),
+
           const SizedBox(height: 8),
 
           ...bundles[network]!.map((b) => Card(
@@ -597,19 +1081,22 @@ class _MobileLoadScreenState extends State<MobileLoadScreen> {
               onChanged: (v) {
                 setState(() {
                   selectedBundle = v!;
-                  amount.text = b['price']!.replaceAll(
-                    RegExp(r'[^0-9]'), '',
-                  );
+                  amount.text = b['price']!;
                 });
               },
-              title: Text(b['name']!,
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text('${b['detail']}  •  ${b['price']}'),
+              title: Text(
+                b['name']!,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                '${b['detail']} • Rs. ${b['price']}',
+              ),
               secondary: const Icon(Icons.wifi, color: brand),
             ),
           )),
 
           const SizedBox(height: 8),
+
           TextField(
             controller: amount,
             keyboardType: TextInputType.number,
@@ -636,7 +1123,7 @@ class _MobileLoadScreenState extends State<MobileLoadScreen> {
                 (mode == 'Bundles' && selectedBundle.isEmpty)) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Enter mobile number, amount and select a package if required.'),
+                  content: Text('Enter mobile number, amount and select a package.'),
                 ),
               );
               return;
@@ -651,11 +1138,14 @@ class _MobileLoadScreenState extends State<MobileLoadScreen> {
 
             final item = mode == 'Load' ? 'Easy Load' : selectedBundle;
 
-            data.add('$item • $network • ${phone.text.trim()}', value);
+            data.add(
+              '$item • $network • ${phone.text.trim()}',
+              value,
+            );
 
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Demo $item recorded. No real top-up/package was activated.'),
+                content: Text('$item demo transaction recorded.'),
               ),
             );
 
@@ -667,156 +1157,9 @@ class _MobileLoadScreenState extends State<MobileLoadScreen> {
         ),
 
         const SizedBox(height: 12),
-        const Text(
-          'Package names and prices are illustrative demo examples only. Actual offers, eligibility and prices must be fetched from an authorized operator/aggregator API. No real load or bundle is activated.',
-          style: TextStyle(color: Colors.deepOrange),
-        ),
-      ],
-    ),
-  );
-}
-class BillPayScreen extends StatefulWidget {
-  const BillPayScreen({super.key});
-  @override
-  State<BillPayScreen> createState() => _BillPayScreenState();
-}
-
-class _BillPayScreenState extends State<BillPayScreen> {
-  final reference = TextEditingController();
-  final amount = TextEditingController();
-
-  String category = 'Electricity';
-  String provider = 'K-Electric';
-
-  final providers = <String, List<String>>{
-    'Electricity': ['K-Electric', 'PESCO', 'IESCO', 'LESCO', 'MEPCO', 'FESCO', 'HESCO', 'SEPCO', 'QESCO', 'GEPCO', 'TESCO'],
-    'Gas': ['SNGPL', 'SSGC'],
-    'Water': ['Karachi Water & Sewerage Corporation', 'WASA Peshawar', 'WASA Lahore', 'WASA Faisalabad'],
-    'Internet': ['PTCL', 'Nayatel', 'StormFiber', 'Transworld'],
-    'Telephone': ['PTCL'],
-    'Government Fees': ['FBR Tax / PSID', 'Traffic E-Challan', 'Passport Fee', 'NADRA Fee', 'Vehicle Token Tax', 'Driving Licence Fee', 'Court Fee / Challan', 'Government Treasury Challan'],
-    'Education Fees': ['Public University Fee', 'Board of Intermediate & Secondary Education', 'Government College Fee'],
-  };
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Bill Payment')),
-    body: ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        const Text('Bill Category',
-          style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 10),
-
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: providers.keys.map((c) => ChoiceChip(
-            label: Text(c),
-            selected: category == c,
-            onSelected: (_) => setState(() {
-              category = c;
-              provider = providers[c]!.first;
-            }),
-          )).toList(),
-        ),
-
-        const SizedBox(height: 20),
-
-        DropdownButtonFormField<String>(
-          value: provider,
-          decoration: const InputDecoration(
-            labelText: 'Select Company / Biller',
-          ),
-          items: providers[category]!
-              .map((p) => DropdownMenuItem(value: p, child: Text(p)))
-              .toList(),
-          onChanged: (v) {
-            if (v != null) setState(() => provider = v);
-          },
-        ),
-
-        const SizedBox(height: 16),
-
-        TextField(
-          controller: reference,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-            labelText: category.contains('Government') ||
-                    category.contains('Education')
-                ? 'PSID / Challan / Student Reference Number'
-                : 'Consumer / Reference Number',
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        TextField(
-          controller: amount,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
-            labelText: 'Bill / Fee Amount (PKR)',
-            prefixText: 'Rs. ',
-          ),
-        ),
-
-        const SizedBox(height: 10),
 
         const Text(
-          'Demo only: enter a sample amount. Real bill enquiry, PSID validation and government fee payment require an approved biller/payment partner API.',
-          style: TextStyle(color: Colors.deepOrange),
-        ),
-
-        const SizedBox(height: 22),
-
-        FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: brand,
-            padding: const EdgeInsets.all(16),
-          ),
-          onPressed: () {
-            final value = double.tryParse(amount.text);
-
-            if (reference.text.trim().isEmpty ||
-                value == null ||
-                value <= 0) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Enter reference number and amount.'),
-                ),
-              );
-              return;
-            }
-
-            if (value > data.balance) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Insufficient demo balance.'),
-                ),
-              );
-              return;
-            }
-
-            data.add(
-              'Bill Pay • $provider • ${reference.text.trim()}',
-              value,
-            );
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Demo bill payment recorded. No bill was paid.'),
-              ),
-            );
-
-            Navigator.pop(context);
-          },
-          child: const Text('Confirm Demo Bill Payment'),
-        ),
-
-        const SizedBox(height: 12),
-
-        const Text(
-          'Demo only: biller lookup and real bill payment are not connected.',
+          'Demo prices only. Real mobile load and packages require an authorized operator API.',
           style: TextStyle(color: Colors.deepOrange),
         ),
       ],
@@ -873,20 +1216,16 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
 
         const SizedBox(height: 18),
 
-        const Text(
-          'Search Bank / Select Bank',
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
-
-        const SizedBox(height: 8),
-
         DropdownButtonFormField<String>(
           value: bank,
           items: banks.map((b) =>
             DropdownMenuItem(value: b, child: Text(b))
           ).toList(),
-          onChanged: (v) => setState(() => bank = v!),
+          onChanged: (v) {
+            if (v != null) setState(() => bank = v);
+          },
           decoration: const InputDecoration(
+            labelText: 'Select Bank / Wallet',
             prefixIcon: Icon(Icons.account_balance),
           ),
         ),
@@ -933,12 +1272,6 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
               v,
             );
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Demo transfer recorded only. No money was sent.'),
-              ),
-            );
-
             Navigator.pop(context);
           },
           child: const Text('Confirm Demo Transfer'),
@@ -947,7 +1280,7 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
         const SizedBox(height: 10),
 
         const Text(
-          'Real transfers require AFT / bank / wallet partner APIs and regulatory approval.',
+          'Demo transfer only. No real money is sent.',
           style: TextStyle(color: Colors.deepOrange),
         ),
       ],
@@ -965,194 +1298,114 @@ class AddMoneyScreen extends StatefulWidget {
 class _AddMoneyScreenState extends State<AddMoneyScreen> {
   final amount = TextEditingController();
 
-  void _message(String title, String detail) {
-    showDialog(
-      context: context,
-      builder: (d) => AlertDialog(
-        title: Text(title),
-        content: Text(detail),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(d),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _addDemoCash() {
-    final v = double.tryParse(amount.text);
-
-    if (v == null || v <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid amount.')),
-      );
-      return;
-    }
-
-    data.add('Add Cash • Demo Deposit', v, credit: true);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Demo cash added locally. No bank/card payment occurred.'),
-      ),
-    );
-
-    Navigator.pop(context);
-  }
-
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Add Cash')),
+    appBar: AppBar(title: const Text('Add Money')),
     body: ListView(
       padding: const EdgeInsets.all(20),
       children: [
+        const Icon(
+          Icons.account_balance_wallet,
+          size: 65,
+          color: brand,
+        ),
+
         const Text(
-          'Choose a method and add cash to your wallet',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: brand,
-          ),
+          'Add Cash to APNA PAY',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
 
         const SizedBox(height: 20),
 
-        Card(
-          elevation: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Your APNA PAY account number',
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                const Text(
-                  'Available after partner onboarding',
-                  style: TextStyle(
-                    color: brand,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Divider(height: 24),
-                const Text(
-                  'Your APNA PAY IBAN',
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                const Text(
-                  'Not issued in demo mode',
-                  style: TextStyle(
-                    color: brand,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        _cashOption(
-          Icons.atm,
-          'Search Cash Deposit Machine',
-          'Find a nearby cash deposit machine (demo preview)',
-          () => _message(
-            'Cash Deposit Machine',
-            'Machine locations will appear after an authorized banking partner provides its service/API.',
-          ),
-        ),
-
-        _cashOption(
+        _addOption(
+          context,
           Icons.account_balance,
-          'Link Your Bank Account',
-          'Connect a bank account securely (demo preview)',
-          () => _message(
-            'Link Your Bank Account',
-            'Bank account linking requires a supported bank/Open Banking partner and secure authorization. No bank details are collected in this demo.',
-          ),
+          'Link Bank Account',
+          'Bank connection preview',
         ),
 
-        _cashOption(
+        _addOption(
+          context,
           Icons.credit_card,
-          'Link any Debit/Credit Card',
-          'Add a card through a secure provider (demo preview)',
-          () => _message(
-            'Link Debit/Credit Card',
-            'Card tokenization and payments require an approved payment gateway. Do not enter card details in this demo.',
-          ),
+          'Link Debit / Credit Card',
+          'Card connection preview',
         ),
 
-        const SizedBox(height: 18),
-
-        const Text(
-          'Demo cash amount',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        _addOption(
+          context,
+          Icons.atm,
+          'Cash Deposit Machine',
+          'Machine finder preview',
         ),
 
-        const SizedBox(height: 8),
+        const SizedBox(height: 20),
 
         TextField(
           controller: amount,
           keyboardType: TextInputType.number,
           decoration: const InputDecoration(
-            labelText: 'Amount (PKR)',
+            labelText: 'Demo Deposit Amount',
             prefixText: 'Rs. ',
           ),
         ),
 
-        const SizedBox(height: 14),
+        const SizedBox(height: 18),
 
         FilledButton(
-          onPressed: _addDemoCash,
+          onPressed: () {
+            final v = double.tryParse(amount.text);
+
+            if (v == null || v <= 0) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Enter a valid amount.'),
+                ),
+              );
+              return;
+            }
+
+            data.add(
+              'Demo Cash Deposit',
+              v,
+              credit: true,
+            );
+
+            Navigator.pop(context);
+          },
           child: const Text('Add Demo Cash'),
         ),
 
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
 
         const Text(
-          'DEMO ONLY: Account number, IBAN, bank linking, card funding and cash-deposit confirmation are not active. Real deposits require an authorized bank/payment partner.',
+          'Demo balance only. Real bank and card deposits are not connected.',
           style: TextStyle(color: Colors.deepOrange),
         ),
       ],
     ),
   );
 
-  Widget _cashOption(
+  Widget _addOption(
+    BuildContext context,
     IconData icon,
     String title,
     String subtitle,
-    VoidCallback onTap,
-  ) => Card(
-    child: ListTile(
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 14,
-        vertical: 8,
+  ) {
+    return Card(
+      child: ListTile(
+        leading: Icon(icon, color: brand),
+        title: Text(title),
+        subtitle: Text(subtitle),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$title is a demo preview.')),
+          );
+        },
       ),
-      leading: CircleAvatar(
-        backgroundColor: const Color(0xFFE3F5EB),
-        child: Icon(icon, color: brand),
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.w700),
-      ),
-      subtitle: Text(subtitle),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: onTap,
-    ),
-  );
+    );
+  }
 }
 class PaymentsScreen extends StatefulWidget {
   const PaymentsScreen({super.key});
@@ -1164,83 +1417,127 @@ class PaymentsScreen extends StatefulWidget {
 class _PaymentsScreenState extends State<PaymentsScreen> {
   final search = TextEditingController();
 
-  final groups = <String, List<String>>{
-    'Payments': [
-      'Electricity', 'Gas', 'Water', 'Telephone',
-      'My Bills', 'MTAG', 'Multiple Bills', 'Split Bill'
-    ],
-    'Education Payments': [
-      'School Fees', 'University Fees', 'Colleges',
-      'Entry Test & Board Fees'
+  final Map<String, List<String>> groups = {
+    'Utility Payments': [
+      'Electricity',
+      'Gas',
+      'Water',
+      'Telephone',
+      'Internet',
     ],
     'Government Payments': [
-      'Government Fees', 'Passport Fee', 'NADRA Fee',
-      'Traffic E-Challan', 'FBR / PSID',
-      'Vehicle Token Tax', 'Driving Licence Fee'
+      'NADRA Fee',
+      'Passport Fee',
+      'FBR / PSID',
+      'Traffic E-Challan',
+      'Vehicle Token Tax',
+      'Driving Licence Fee',
+      'Government Challan',
     ],
-    'Lifestyle & Other': [
-      'Internet', 'Insurance', 'E-commerce', 'Travel',
-      'Investment', 'Real Estate', 'Leisure', 'Credit Card',
-      'Food', 'Corporate', 'Financial Services', 'Hotels'
+    'Education Payments': [
+      'School Fees',
+      'University Fees',
+      'College Fees',
+      'Board Examination Fee',
+      'Entry Test Fee',
+    ],
+    'Other Services': [
+      'Insurance',
+      'Credit Card',
+      'E-commerce',
+      'Travel',
+      'Financial Services',
+      'Hotels',
     ],
   };
+
+  IconData getIcon(String name) {
+    if (name == 'Electricity') return Icons.bolt;
+    if (name == 'Gas') return Icons.local_fire_department;
+    if (name == 'Water') return Icons.water_drop;
+    if (name == 'Telephone') return Icons.phone;
+    if (name == 'Internet') return Icons.wifi;
+    if (name.contains('NADRA')) return Icons.badge;
+    if (name.contains('Passport')) return Icons.menu_book;
+    if (name.contains('FBR')) return Icons.account_balance;
+    if (name.contains('Challan')) return Icons.receipt_long;
+    if (name.contains('School')) return Icons.school;
+    if (name.contains('University')) return Icons.cast_for_education;
+    if (name.contains('College')) return Icons.school_outlined;
+    if (name.contains('Driving')) return Icons.directions_car;
+    if (name.contains('Vehicle')) return Icons.directions_car_filled;
+    if (name.contains('Insurance')) return Icons.security;
+    if (name.contains('Credit')) return Icons.credit_card;
+    if (name.contains('Travel')) return Icons.flight;
+    return Icons.payments;
+  }
+
+  void openService(String service) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ServicePaymentScreen(service: service),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final q = search.text.toLowerCase();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Payments')),
+      appBar: AppBar(
+        title: const Text('Payments & Services'),
+      ),
+
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           const Text(
-            'All your payments in one place!',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            'All Payments in One Place',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
           ),
+
+          const SizedBox(height: 8),
+
+          const Text(
+            'Select the service you want to use.',
+            style: TextStyle(color: Colors.black54),
+          ),
+
           const SizedBox(height: 16),
 
           TextField(
             controller: search,
             onChanged: (_) => setState(() {}),
             decoration: const InputDecoration(
-              hintText: 'Search by Biller Name or Category',
+              hintText: 'Search service...',
               prefixIcon: Icon(Icons.search),
             ),
           ),
 
-          const SizedBox(height: 14),
-
-          Card(
-            shape: RoundedRectangleBorder(
-              side: const BorderSide(color: brand),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: ListTile(
-              leading: const Icon(Icons.receipt_long, color: brand),
-              title: const Text('My Bills'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const BillPayScreen(),
-                ),
-              ),
-            ),
-          ),
+          const SizedBox(height: 20),
 
           ...groups.entries.map((entry) {
             final items = entry.value
                 .where((e) => e.toLowerCase().contains(q))
                 .toList();
 
-            if (items.isEmpty) return const SizedBox.shrink();
+            if (items.isEmpty) {
+              return const SizedBox.shrink();
+            }
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 22, bottom: 12),
+                  padding: const EdgeInsets.only(
+                    top: 16,
+                    bottom: 12,
+                  ),
                   child: Text(
                     entry.key,
                     style: const TextStyle(
@@ -1254,41 +1551,63 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: items.length,
+
                   gridDelegate:
                       const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    childAspectRatio: .82,
-                    crossAxisSpacing: 8,
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 10,
                     mainAxisSpacing: 12,
+                    childAspectRatio: .90,
                   ),
-                  itemBuilder: (context, i) {
-                    final e = items[i];
+
+                  itemBuilder: (context, index) {
+                    final service = items[index];
 
                     return InkWell(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const BillPayScreen(),
+                      borderRadius: BorderRadius.circular(14),
+
+                      onTap: () {
+                        openService(service);
+                      },
+
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: const Color(0xFFDCE9E1),
+                          ),
                         ),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircleAvatar(
-                            radius: 25,
-                            backgroundColor: const Color(0xFFE3F5EB),
-                            child: Icon(_icon(e), color: brand),
-                          ),
-                          const SizedBox(height: 7),
-                          Text(
-                            e,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
+
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: 25,
+                              backgroundColor:
+                                  const Color(0xFFE3F5EB),
+                              child: Icon(
+                                getIcon(service),
+                                color: brand,
+                                size: 26,
+                              ),
                             ),
-                          ),
-                        ],
+
+                            const SizedBox(height: 9),
+
+                            Text(
+                              service,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
@@ -1297,10 +1616,22 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
             );
           }),
 
-          const SizedBox(height: 12),
+          if (groups.values
+              .expand((e) => e)
+              .where((e) => e.toLowerCase().contains(q))
+              .isEmpty)
+            const Padding(
+              padding: EdgeInsets.all(30),
+              child: Text(
+                'No service found.',
+                textAlign: TextAlign.center,
+              ),
+            ),
+
+          const SizedBox(height: 20),
 
           const Text(
-            'Service availability depends on an approved biller/payment partner. These are demo navigation screens; no real bill is paid.',
+            'Demo services only. Real payments require authorized service provider APIs.',
             style: TextStyle(color: Colors.deepOrange),
           ),
         ],
@@ -1309,16 +1640,224 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
   }
 }
 
-IconData _icon(String s) {
-  if (s.contains('Electric')) return Icons.bolt;
-  if (s == 'Gas') return Icons.local_fire_department;
-  if (s == 'Water') return Icons.water_drop;
-  if (s.contains('Fees')) return Icons.school;
-  if (s.contains('Internet')) return Icons.wifi;
-  if (s.contains('Telephone')) return Icons.phone;
-  return Icons.receipt_long;
+
+// INDIVIDUAL SERVICE PAYMENT SCREEN
+
+class ServicePaymentScreen extends StatefulWidget {
+  final String service;
+
+  const ServicePaymentScreen({
+    super.key,
+    required this.service,
+  });
+
+  @override
+  State<ServicePaymentScreen> createState() =>
+      _ServicePaymentScreenState();
 }
 
+class _ServicePaymentScreenState
+    extends State<ServicePaymentScreen> {
+
+  final reference = TextEditingController();
+  final amount = TextEditingController();
+  final customerName = TextEditingController();
+
+  String get referenceLabel {
+    final s = widget.service;
+
+    if (s.contains('NADRA')) return 'CNIC / Application Number';
+    if (s.contains('Passport')) return 'Passport Application Number';
+    if (s.contains('FBR')) return 'PSID Number';
+    if (s.contains('E-Challan')) return 'Challan Number';
+    if (s.contains('Vehicle')) return 'Vehicle Registration Number';
+    if (s.contains('Driving')) return 'Licence / Application Number';
+    if (s.contains('School')) return 'Student ID / Fee Reference';
+    if (s.contains('University')) return 'University Registration Number';
+    if (s.contains('College')) return 'College Student ID';
+    if (s.contains('Board')) return 'Roll Number / Challan Number';
+    if (s.contains('Entry')) return 'Application / Test Number';
+
+    if (s == 'Electricity') return '14-digit Reference Number';
+    if (s == 'Gas') return 'Consumer Number';
+    if (s == 'Water') return 'Consumer / Account Number';
+    if (s == 'Telephone') return 'Telephone Number';
+    if (s == 'Internet') return 'Customer / Account Number';
+
+    return 'Reference / Account Number';
+  }
+
+  IconData get serviceIcon {
+    final s = widget.service;
+
+    if (s == 'Electricity') return Icons.bolt;
+    if (s == 'Gas') return Icons.local_fire_department;
+    if (s == 'Water') return Icons.water_drop;
+    if (s == 'Internet') return Icons.wifi;
+    if (s.contains('School') || s.contains('University')) {
+      return Icons.school;
+    }
+    if (s.contains('Passport')) return Icons.menu_book;
+    if (s.contains('NADRA')) return Icons.badge;
+    if (s.contains('Vehicle') || s.contains('Driving')) {
+      return Icons.directions_car;
+    }
+
+    return Icons.receipt_long;
+  }
+
+  void submitPayment() {
+    final value = double.tryParse(amount.text.trim());
+
+    if (reference.text.trim().isEmpty ||
+        value == null ||
+        value <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Please enter reference number and valid amount.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (value > data.balance) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Insufficient demo balance.'),
+        ),
+      );
+      return;
+    }
+
+    data.add(
+      '${widget.service} • ${reference.text.trim()}',
+      value,
+    );
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Demo Transaction Successful'),
+        content: Text(
+          '${widget.service}\n'
+          'Reference: ${reference.text.trim()}\n'
+          'Amount: Rs. ${value.toStringAsFixed(2)}\n\n'
+          'This is only a local demo record. No real bill or fee was paid.',
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              Navigator.pop(context);
+            },
+            child: const Text('Done'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(
+      title: Text(widget.service),
+    ),
+
+    body: ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        CircleAvatar(
+          radius: 38,
+          backgroundColor: const Color(0xFFE3F5EB),
+          child: Icon(
+            serviceIcon,
+            color: brand,
+            size: 42,
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        Text(
+          widget.service,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        const Text(
+          'Enter your payment information below.',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.black54),
+        ),
+
+        const SizedBox(height: 24),
+
+        TextField(
+          controller: customerName,
+          decoration: const InputDecoration(
+            labelText: 'Customer Name (Optional)',
+            prefixIcon: Icon(Icons.person),
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        TextField(
+          controller: reference,
+          decoration: InputDecoration(
+            labelText: referenceLabel,
+            prefixIcon: const Icon(Icons.numbers),
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        TextField(
+          controller: amount,
+          keyboardType: const TextInputType.numberWithOptions(
+            decimal: true,
+          ),
+          decoration: const InputDecoration(
+            labelText: 'Amount in PKR',
+            prefixText: 'Rs. ',
+            prefixIcon: Icon(Icons.payments),
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        FilledButton.icon(
+          style: FilledButton.styleFrom(
+            backgroundColor: brand,
+            padding: const EdgeInsets.all(16),
+          ),
+
+          onPressed: submitPayment,
+
+          icon: const Icon(Icons.check_circle),
+          label: const Text('Continue Demo Payment'),
+        ),
+
+        const SizedBox(height: 16),
+
+        const Text(
+          'IMPORTANT: This screen is a demonstration only. It does not verify bill details, PSID, CNIC, challan or student fees. No actual payment is made.',
+          style: TextStyle(
+            color: Colors.deepOrange,
+            fontSize: 12,
+          ),
+        ),
+      ],
+    ),
+  );
+}
 class QuickActionsScreen extends StatelessWidget {
   const QuickActionsScreen({super.key});
 
@@ -1328,40 +1867,87 @@ class QuickActionsScreen extends StatelessWidget {
     body: ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const Icon(Icons.qr_code_scanner, size: 90, color: brand),
+        const Icon(
+          Icons.qr_code_scanner,
+          size: 90,
+          color: brand,
+        ),
+
+        const SizedBox(height: 12),
+
         const Text(
           'Scan & Pay',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+
         const SizedBox(height: 8),
+
         const Text(
-          'QR payment preview. Camera and merchant payment network are not connected.',
+          'Scan QR and pay merchants (demo preview).',
           textAlign: TextAlign.center,
         ),
+
         const SizedBox(height: 22),
-        FilledButton(
-          onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('QR payments will be enabled after partner integration.'),
-            ),
-          ),
-          child: const Text('Open QR Scanner (Demo)'),
+
+        FilledButton.icon(
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'QR scanner requires an approved QR payment integration.',
+                ),
+              ),
+            );
+          },
+          icon: const Icon(Icons.qr_code_scanner),
+          label: const Text('Open QR Scanner'),
         ),
+
         const SizedBox(height: 12),
+
         OutlinedButton(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const SendMoneyScreen(),
-            ),
-          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const PaymentsScreen(),
+              ),
+            );
+          },
+          child: const Text('All Payments & Services'),
+        ),
+
+        const SizedBox(height: 12),
+
+        OutlinedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const SendMoneyScreen(),
+              ),
+            );
+          },
           child: const Text('Send Money'),
+        ),
+
+        const SizedBox(height: 20),
+
+        const Text(
+          'QR scanning and real merchant payments are not connected in this demo.',
+          style: TextStyle(color: Colors.deepOrange),
         ),
       ],
     ),
   );
 }
+
+
+// CARDS SCREEN
 
 class CardsScreen extends StatelessWidget {
   const CardsScreen({super.key});
@@ -1377,7 +1963,10 @@ class CardsScreen extends StatelessWidget {
           padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFF16B879), Color(0xFF07583C)],
+              colors: [
+                Color(0xFF16B879),
+                Color(0xFF07583C),
+              ],
             ),
             borderRadius: BorderRadius.circular(20),
           ),
@@ -1393,7 +1982,11 @@ class CardsScreen extends StatelessWidget {
                 ),
               ),
               Spacer(),
-              Icon(Icons.contactless, color: Colors.white, size: 34),
+              Icon(
+                Icons.contactless,
+                color: Colors.white,
+                size: 34,
+              ),
               Spacer(),
               Text(
                 'DEMO CARD • **** **** **** 0000',
@@ -1409,32 +2002,56 @@ class CardsScreen extends StatelessWidget {
         const SizedBox(height: 20),
 
         const Text(
-          'Card services',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          'Card Services',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
 
         ListTile(
-          leading: const Icon(Icons.credit_card, color: brand),
+          leading: const Icon(
+            Icons.credit_card,
+            color: brand,
+          ),
           title: const Text('Order Debit Card'),
-          subtitle: const Text('Physical / Virtual card (preview)'),
-          onTap: () => _cardMessage(context),
+          subtitle: const Text('Physical / Virtual Card'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => _cardMessage(
+            context,
+            'Card ordering requires an approved issuing bank.',
+          ),
         ),
 
         ListTile(
-          leading: const Icon(Icons.lock_outline, color: brand),
+          leading: const Icon(
+            Icons.lock_outline,
+            color: brand,
+          ),
           title: const Text('Card Controls'),
-          subtitle: const Text('Freeze, unfreeze and manage card (demo)'),
-          onTap: () => _cardMessage(context),
+          subtitle: const Text('Freeze / Unfreeze Card'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => _cardMessage(
+            context,
+            'Card controls are available after card issuance.',
+          ),
         ),
 
         ListTile(
-          leading: const Icon(Icons.local_offer, color: brand),
+          leading: const Icon(
+            Icons.local_offer,
+            color: brand,
+          ),
           title: const Text('Card Discounts'),
-          onTap: () => _cardMessage(context),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => _cardMessage(
+            context,
+            'Card discounts will be available after partner integration.',
+          ),
         ),
 
         const Text(
-          'Real card issuance requires issuer/bank partner approval.',
+          'Demo card only. No real card has been issued.',
           style: TextStyle(color: Colors.deepOrange),
         ),
       ],
@@ -1442,12 +2059,24 @@ class CardsScreen extends StatelessWidget {
   );
 }
 
-void _cardMessage(BuildContext c) =>
-    ScaffoldMessenger.of(c).showSnackBar(
-      const SnackBar(
-        content: Text('Card feature preview only. No card is issued.'),
-      ),
-    );
+void _cardMessage(BuildContext context, String message) {
+  showDialog(
+    context: context,
+    builder: (d) => AlertDialog(
+      title: const Text('APNA PAY Cards'),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(d),
+          child: const Text('Close'),
+        ),
+      ],
+    ),
+  );
+}
+
+
+// HELP AND SUPPORT
 
 class HelpScreen extends StatelessWidget {
   const HelpScreen({super.key});
@@ -1460,10 +2089,16 @@ class HelpScreen extends StatelessWidget {
       children: [
         const Text(
           'How can we help you?',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+
         const SizedBox(height: 8),
+
         const Text('Please select from the options below'),
+
         const SizedBox(height: 16),
 
         ...[
@@ -1480,7 +2115,10 @@ class HelpScreen extends StatelessWidget {
         ].map(
           (e) => Card(
             child: ListTile(
-              leading: const Icon(Icons.support_agent, color: brand),
+              leading: const Icon(
+                Icons.support_agent,
+                color: brand,
+              ),
               title: Text(e),
               trailing: const Icon(Icons.arrow_forward),
               onTap: () => _helpAction(context, e),
@@ -1492,11 +2130,11 @@ class HelpScreen extends StatelessWidget {
   );
 }
 
-void _helpAction(BuildContext c, String title) {
+void _helpAction(BuildContext context, String title) {
   final ctrl = TextEditingController();
 
   showDialog(
-    context: c,
+    context: context,
     builder: (d) => AlertDialog(
       title: Text(title),
       content: TextField(
@@ -1511,12 +2149,30 @@ void _helpAction(BuildContext c, String title) {
           onPressed: () => Navigator.pop(d),
           child: const Text('Cancel'),
         ),
+
         FilledButton(
           onPressed: () {
+            if (ctrl.text.trim().isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Please enter details.'),
+                ),
+              );
+              return;
+            }
+
+            data.activity.insert(
+              0,
+              '$title • ${ctrl.text.trim()}',
+            );
+
+            data.notifyListeners();
+
             Navigator.pop(d);
-            ScaffoldMessenger.of(c).showSnackBar(
-              SnackBar(
-                content: Text('$title saved locally in demo only.'),
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Demo request saved locally.'),
               ),
             );
           },
@@ -1527,6 +2183,9 @@ void _helpAction(BuildContext c, String title) {
   );
 }
 
+
+// TRANSACTION HISTORY
+
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
 
@@ -1534,19 +2193,47 @@ class HistoryScreen extends StatelessWidget {
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: data,
     builder: (_, __) => Scaffold(
-      appBar: AppBar(title: const Text('Transaction History')),
-      body: ListView(
-        children: data.activity.map(
-          (e) => ListTile(
-            leading: const Icon(Icons.receipt_long, color: brand),
-            title: Text(e),
-            subtitle: const Text('Demo transaction'),
-          ),
-        ).toList(),
+      appBar: AppBar(
+        title: const Text('Transaction History'),
       ),
+
+      body: data.activity.isEmpty
+          ? const Center(
+              child: Text('No transactions found.'),
+            )
+          : ListView.builder(
+              itemCount: data.activity.length,
+              itemBuilder: (context, index) {
+                final item = data.activity[index];
+
+                return Card(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 5,
+                  ),
+                  child: ListTile(
+                    leading: const CircleAvatar(
+                      backgroundColor: Color(0xFFE3F5EB),
+                      child: Icon(
+                        Icons.receipt_long,
+                        color: brand,
+                      ),
+                    ),
+                    title: Text(item),
+                    subtitle: const Text('Demo transaction'),
+                    trailing: const Icon(
+                      Icons.chevron_right,
+                    ),
+                  ),
+                );
+              },
+            ),
     ),
   );
 }
+
+
+// PROFILE SCREEN
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -1555,19 +2242,29 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: data,
     builder: (_, __) => Scaffold(
-      appBar: AppBar(title: const Text('My Account')),
+      appBar: AppBar(
+        title: const Text('My Account'),
+      ),
+
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
           const CircleAvatar(
             radius: 42,
             backgroundColor: brand,
-            child: Icon(Icons.person, size: 48, color: Colors.white),
+            child: Icon(
+              Icons.person,
+              size: 48,
+              color: Colors.white,
+            ),
           ),
+
           const SizedBox(height: 12),
 
           Text(
-            data.fullName.isEmpty ? 'Demo User' : data.fullName,
+            data.fullName.isEmpty
+                ? 'Demo User'
+                : data.fullName,
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 22,
@@ -1575,14 +2272,26 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
 
-          Text(data.phone, textAlign: TextAlign.center),
+          Text(
+            data.phone,
+            textAlign: TextAlign.center,
+          ),
 
           const SizedBox(height: 20),
 
           ListTile(
             leading: const Icon(Icons.verified_user),
-            title: const Text('KYC'),
+            title: const Text('KYC Status'),
             subtitle: Text(data.kycStatus),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const KycScreen(),
+                ),
+              );
+            },
           ),
 
           const ListTile(
@@ -1603,8 +2312,27 @@ class ProfileScreen extends StatelessWidget {
             subtitle: Text('APNA PAY Demo 1.0'),
           ),
 
+          const SizedBox(height: 20),
+
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const WelcomeScreen(),
+                ),
+                (route) => false,
+              );
+            },
+            icon: const Icon(Icons.logout),
+            label: const Text('Logout'),
+          ),
+
+          const SizedBox(height: 12),
+
           const Text(
-            'This is a prototype. Do not use real identity or payment details.',
+            'This is a demo prototype. Real financial services require authorized partners.',
+            textAlign: TextAlign.center,
             style: TextStyle(color: Colors.deepOrange),
           ),
         ],
